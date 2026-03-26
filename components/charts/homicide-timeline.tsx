@@ -77,8 +77,8 @@ export function HomicideTimeline({
           >
             <defs>
               <linearGradient id="homicideGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8b0000" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#8b0000" stopOpacity={0.1} />
+                <stop offset="5%" stopColor="#c9a84c" stopOpacity={0.6} />
+                <stop offset="95%" stopColor="#c9a84c" stopOpacity={0.05} />
               </linearGradient>
             </defs>
             <CartesianGrid
@@ -136,7 +136,7 @@ export function HomicideTimeline({
             <Area
               type="monotone"
               dataKey="homicides"
-              stroke="#8b0000"
+              stroke="#c9a84c"
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#homicideGradient)"
