@@ -42,6 +42,7 @@ export function PresidentCard({ president, index }: PresidentCardProps) {
               src={president.imageUrl}
               alt={`${president.name} - President of Mexico (${president.years})`}
               fill
+              sizes="(max-width: 768px) 100vw, 192px"
               className="object-cover w-full h-full"
               quality={75}
             />

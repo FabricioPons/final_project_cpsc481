@@ -355,6 +355,68 @@ export const elMenchoTimeline = [
   { year: 2026, event: "Dies on February 22, 2026" },
 ];
 
+// State-level homicide data (per 100,000 population, 2023 INEGI data)
+// Source: INEGI - Sistema Nacional de Información Estadística
+export interface StateData {
+  name: string;
+  code: string;
+  homicideRate: number; // per 100,000
+  totalHomicides: number;
+  cartelPresence: string[];
+  violenceLevel: "low" | "medium" | "high" | "extreme";
+}
+
+export const stateHomicideData: StateData[] = [
+  { name: "Aguascalientes", code: "01", homicideRate: 5.2, totalHomicides: 78, cartelPresence: ["CJNG"], violenceLevel: "low" },
+  { name: "Baja California", code: "02", homicideRate: 42.1, totalHomicides: 1523, cartelPresence: ["CJNG", "Sinaloa"], violenceLevel: "extreme" },
+  { name: "Baja California Sur", code: "03", homicideRate: 28.4, totalHomicides: 245, cartelPresence: ["CJNG", "Sinaloa"], violenceLevel: "high" },
+  { name: "Campeche", code: "04", homicideRate: 4.8, totalHomicides: 47, cartelPresence: ["Gulf"], violenceLevel: "low" },
+  { name: "Coahuila", code: "05", homicideRate: 18.3, totalHomicides: 589, cartelPresence: ["Zetas", "CDN"], violenceLevel: "medium" },
+  { name: "Colima", code: "06", homicideRate: 98.3, totalHomicides: 789, cartelPresence: ["CJNG", "Sinaloa"], violenceLevel: "extreme" },
+  { name: "Chiapas", code: "07", homicideRate: 12.8, totalHomicides: 723, cartelPresence: ["CJNG", "Sinaloa"], violenceLevel: "medium" },
+  { name: "Chihuahua", code: "08", homicideRate: 52.4, totalHomicides: 2012, cartelPresence: ["Sinaloa", "Juárez", "La Línea"], violenceLevel: "extreme" },
+  { name: "Ciudad de México", code: "09", homicideRate: 11.2, totalHomicides: 1024, cartelPresence: ["CJNG", "Unión Tepito"], violenceLevel: "medium" },
+  { name: "Durango", code: "10", homicideRate: 23.5, totalHomicides: 435, cartelPresence: ["Sinaloa"], violenceLevel: "high" },
+  { name: "Guanajuato", code: "11", homicideRate: 67.8, totalHomicides: 4234, cartelPresence: ["CJNG", "Santa Rosa de Lima"], violenceLevel: "extreme" },
+  { name: "Guerrero", code: "12", homicideRate: 58.2, totalHomicides: 2089, cartelPresence: ["CJNG", "Sinaloa", "Familia Michoacana"], violenceLevel: "extreme" },
+  { name: "Hidalgo", code: "13", homicideRate: 8.1, totalHomicides: 247, cartelPresence: ["CJNG"], violenceLevel: "low" },
+  { name: "Jalisco", code: "14", homicideRate: 32.4, totalHomicides: 2712, cartelPresence: ["CJNG"], violenceLevel: "high" },
+  { name: "México", code: "15", homicideRate: 16.8, totalHomicides: 2934, cartelPresence: ["CJNG", "Familia Michoacana"], violenceLevel: "medium" },
+  { name: "Michoacán", code: "16", homicideRate: 45.6, totalHomicides: 2145, cartelPresence: ["CJNG", "Viagras", "Familia Michoacana"], violenceLevel: "extreme" },
+  { name: "Morelos", code: "17", homicideRate: 38.7, totalHomicides: 789, cartelPresence: ["CJNG", "Guerreros Unidos"], violenceLevel: "high" },
+  { name: "Nayarit", code: "18", homicideRate: 24.3, totalHomicides: 312, cartelPresence: ["CJNG", "Sinaloa"], violenceLevel: "high" },
+  { name: "Nuevo León", code: "19", homicideRate: 15.2, totalHomicides: 856, cartelPresence: ["Zetas", "CDN", "Gulf"], violenceLevel: "medium" },
+  { name: "Oaxaca", code: "20", homicideRate: 18.9, totalHomicides: 789, cartelPresence: ["CJNG", "Sinaloa"], violenceLevel: "medium" },
+  { name: "Puebla", code: "21", homicideRate: 12.3, totalHomicides: 823, cartelPresence: ["CJNG"], violenceLevel: "medium" },
+  { name: "Querétaro", code: "22", homicideRate: 7.8, totalHomicides: 178, cartelPresence: ["CJNG"], violenceLevel: "low" },
+  { name: "Quintana Roo", code: "23", homicideRate: 35.2, totalHomicides: 645, cartelPresence: ["CJNG", "Sinaloa", "Gulf"], violenceLevel: "high" },
+  { name: "San Luis Potosí", code: "24", homicideRate: 21.4, totalHomicides: 612, cartelPresence: ["CJNG", "Gulf"], violenceLevel: "high" },
+  { name: "Sinaloa", code: "25", homicideRate: 41.2, totalHomicides: 1289, cartelPresence: ["Sinaloa", "CJNG"], violenceLevel: "extreme" },
+  { name: "Sonora", code: "26", homicideRate: 46.8, totalHomicides: 1423, cartelPresence: ["Sinaloa", "CJNG"], violenceLevel: "extreme" },
+  { name: "Tabasco", code: "27", homicideRate: 14.5, totalHomicides: 367, cartelPresence: ["CJNG", "Gulf"], violenceLevel: "medium" },
+  { name: "Tamaulipas", code: "28", homicideRate: 28.9, totalHomicides: 1012, cartelPresence: ["Gulf", "CDN", "Zetas"], violenceLevel: "high" },
+  { name: "Tlaxcala", code: "29", homicideRate: 6.2, totalHomicides: 89, cartelPresence: ["CJNG"], violenceLevel: "low" },
+  { name: "Veracruz", code: "30", homicideRate: 15.8, totalHomicides: 1312, cartelPresence: ["CJNG", "Zetas"], violenceLevel: "medium" },
+  { name: "Yucatán", code: "31", homicideRate: 2.8, totalHomicides: 67, cartelPresence: [], violenceLevel: "low" },
+  { name: "Zacatecas", code: "32", homicideRate: 72.4, totalHomicides: 1189, cartelPresence: ["CJNG", "Sinaloa"], violenceLevel: "extreme" },
+];
+
+// Get violence level color based on homicide rate
+export const getViolenceLevelColor = (rate: number): string => {
+  if (rate < 10) return "#1a2e1a"; // Dark green - low
+  if (rate < 25) return "#4a3728"; // Brown - medium
+  if (rate < 45) return "#7d4e2e"; // Orange-brown - high
+  return "#8b2500"; // Deep red-brown - extreme
+};
+
+// Get violence level from rate
+export const getViolenceLevel = (rate: number): string => {
+  if (rate < 10) return "Low (<10)";
+  if (rate < 25) return "Medium (10-25)";
+  if (rate < 45) return "High (25-45)";
+  return "Extreme (>45)";
+};
+
 // Cumulative death toll calculation
 export const getCumulativeDeaths = () => {
   let total = 0;

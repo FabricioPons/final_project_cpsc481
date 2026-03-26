@@ -47,6 +47,7 @@ export function ElMenchoSection() {
                 src="/images/el-mencho-silhouette.jpg"
                 alt="El Mencho - Nemesio Oseguera Cervantes"
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover w-full h-full"
                 priority
               />

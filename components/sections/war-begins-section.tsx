@@ -59,6 +59,7 @@ export function WarBeginsSection() {
                 src="/images/military-silhouette.jpg"
                 alt="Mexican military deployment during Calderón's drug war"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover w-full h-full"
                 quality={75}
               />

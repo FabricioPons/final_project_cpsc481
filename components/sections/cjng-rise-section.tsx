@@ -48,6 +48,7 @@ export function CJNGRiseSection() {
                 src="/images/cartel-infographic.jpg"
                 alt="CJNG cartel network and organizational structure"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover w-full h-full"
                 quality={75}
               />

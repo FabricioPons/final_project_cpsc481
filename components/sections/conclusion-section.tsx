@@ -75,6 +75,7 @@ export function ConclusionSection() {
                 src="/images/memorial-candles.jpg"
                 alt="Memorial vigil for victims of Mexico's drug war"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover w-full h-full"
                 quality={75}
               />
