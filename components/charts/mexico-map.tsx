@@ -1,74 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect, memo, useMemo } from "react";
+import { useState, memo } from "react";
 import { motion, useInView } from "framer-motion";
-import * as d3Geo from "d3-geo";
-import * as topojson from "topojson-client";
+import { useRef } from "react";
 import { stateHomicideData, getViolenceLevelColor } from "@/lib/data";
-
-// TopoJSON URL for Mexico states (official INEGI data)
-const MEXICO_TOPOJSON_URL =
-  "https://raw.githubusercontent.com/angelnmara/geojson/master/mexicoHigh.json";
-
-// State name mapping from GeoJSON properties to our data
-const stateNameMapping: Record<string, string> = {
-  Aguascalientes: "Aguascalientes",
-  "Baja California": "Baja California",
-  "Baja California Sur": "Baja California Sur",
-  Campeche: "Campeche",
-  Chiapas: "Chiapas",
-  Chihuahua: "Chihuahua",
-  "Coahuila de Zaragoza": "Coahuila",
-  Coahuila: "Coahuila",
-  Colima: "Colima",
-  "Ciudad de México": "Ciudad de México",
-  "Distrito Federal": "Ciudad de México",
-  Durango: "Durango",
-  Guanajuato: "Guanajuato",
-  Guerrero: "Guerrero",
-  Hidalgo: "Hidalgo",
-  Jalisco: "Jalisco",
-  México: "México",
-  Mexico: "México",
-  "Estado de México": "México",
-  "Michoacán de Ocampo": "Michoacán",
-  Michoacán: "Michoacán",
-  Morelos: "Morelos",
-  Nayarit: "Nayarit",
-  "Nuevo León": "Nuevo León",
-  Oaxaca: "Oaxaca",
-  Puebla: "Puebla",
-  Querétaro: "Querétaro",
-  Queretaro: "Querétaro",
-  "Quintana Roo": "Quintana Roo",
-  "San Luis Potosí": "San Luis Potosí",
-  "San Luis Potosi": "San Luis Potosí",
-  Sinaloa: "Sinaloa",
-  Sonora: "Sonora",
-  Tabasco: "Tabasco",
-  Tamaulipas: "Tamaulipas",
-  Tlaxcala: "Tlaxcala",
-  "Veracruz de Ignacio de la Llave": "Veracruz",
-  Veracruz: "Veracruz",
-  Yucatán: "Yucatán",
-  Yucatan: "Yucatán",
-  Zacatecas: "Zacatecas",
-};
-
-interface GeoFeature {
-  type: string;
-  properties: {
-    name?: string;
-    NAME?: string;
-    ESTADO?: string;
-    state_name?: string;
-    NOM_ENT?: string;
-  };
-  geometry: {
-    type: string;
-    coordinates: number[][][] | number[][][][];
-  };
-}
 
 interface MexicoMapProps {
   title?: string;
@@ -77,6 +12,65 @@ interface MexicoMapProps {
   showLegend?: boolean;
 }
 
+// Simplified state coordinates for D3-style visualization
+interface StateCoord {
+  name: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  region: string;
+}
+
+const stateCoordinates: StateCoord[] = [
+  // Northern Border states
+  { name: "Baja California", x: 20, y: 40, width: 50, height: 60, region: "NW" },
+  { name: "Sonora", x: 80, y: 35, width: 70, height: 80, region: "NW" },
+  { name: "Chihuahua", x: 90, y: 130, width: 80, height: 90, region: "N" },
+  { name: "Coahuila", x: 160, y: 120, width: 90, height: 100, region: "N" },
+  { name: "Nuevo León", x: 210, y: 110, width: 60, height: 80, region: "NE" },
+  { name: "Tamaulipas", x: 240, y: 80, width: 50, height: 100, region: "NE" },
+
+  // Central-North states
+  { name: "Durango", x: 110, y: 220, width: 60, height: 90, region: "NC" },
+  { name: "Zacatecas", x: 160, y: 240, width: 50, height: 60, region: "NC" },
+  { name: "San Luis Potosí", x: 200, y: 240, width: 60, height: 80, region: "NC" },
+
+  // West states
+  { name: "Sinaloa", x: 60, y: 150, width: 50, height: 90, region: "W" },
+  { name: "Nayarit", x: 70, y: 250, width: 40, height: 50, region: "W" },
+  { name: "Jalisco", x: 100, y: 310, width: 60, height: 70, region: "W" },
+  { name: "Colima", x: 90, y: 380, width: 30, height: 40, region: "W" },
+  { name: "Michoacán", x: 140, y: 340, width: 60, height: 70, region: "W" },
+
+  // Central states
+  { name: "Guanajuato", x: 160, y: 310, width: 50, height: 60, region: "C" },
+  { name: "Querétaro", x: 180, y: 280, width: 40, height: 50, region: "C" },
+  { name: "Hidalgo", x: 210, y: 290, width: 40, height: 60, region: "C" },
+  { name: "México", x: 220, y: 350, width: 40, height: 50, region: "C" },
+  { name: "Ciudad de México", x: 235, y: 375, width: 25, height: 25, region: "C" },
+  { name: "Tlaxcala", x: 250, y: 360, width: 25, height: 30, region: "C" },
+  { name: "Morelos", x: 230, y: 395, width: 30, height: 35, region: "C" },
+
+  // Eastern states
+  { name: "Veracruz", x: 250, y: 310, width: 55, height: 120, region: "E" },
+  { name: "Puebla", x: 240, y: 340, width: 50, height: 70, region: "E" },
+
+  // Southern states
+  { name: "Oaxaca", x: 220, y: 420, width: 70, height: 90, region: "S" },
+  { name: "Guerrero", x: 160, y: 420, width: 60, height: 80, region: "S" },
+  { name: "Chiapas", x: 230, y: 500, width: 70, height: 80, region: "S" },
+  { name: "Tabasco", x: 280, y: 450, width: 50, height: 60, region: "S" },
+
+  // Peninsula states
+  { name: "Yucatán", x: 340, y: 420, width: 50, height: 60, region: "P" },
+  { name: "Campeche", x: 300, y: 470, width: 60, height: 80, region: "P" },
+  { name: "Quintana Roo", x: 350, y: 480, width: 50, height: 80, region: "P" },
+
+  // Baja California Sur (isolated)
+  { name: "Baja California Sur", x: 30, y: 280, width: 40, height: 100, region: "NW" },
+];
+
 function MexicoMapComponent({
   title = "Violence Across Mexico",
   subtitle = "Homicide rates per 100,000 population (2023)",
@@ -84,88 +78,10 @@ function MexicoMapComponent({
   showLegend = true,
 }: MexicoMapProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-10%" });
   const [hoveredState, setHoveredState] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const [geoData, setGeoData] = useState<GeoFeature[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Map dimensions
-  const width = 800;
-  const height = 600;
-
-  // Fetch GeoJSON data
-  useEffect(() => {
-    const fetchGeoData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(MEXICO_TOPOJSON_URL);
-        if (!response.ok) throw new Error("Failed to fetch map data");
-
-        const data = await response.json();
-
-        // Handle both GeoJSON and TopoJSON formats
-        let features: GeoFeature[];
-        if (data.type === "Topology") {
-          // TopoJSON format
-          const objectKey = Object.keys(data.objects)[0];
-          features = topojson.feature(data, data.objects[objectKey])
-            .features as GeoFeature[];
-        } else if (data.type === "FeatureCollection") {
-          // GeoJSON format
-          features = data.features as GeoFeature[];
-        } else {
-          throw new Error("Unknown data format");
-        }
-
-        setGeoData(features);
-        setError(null);
-      } catch (err) {
-        console.error("Error loading map:", err);
-        setError("Failed to load map data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGeoData();
-  }, []);
-
-  // D3 projection for Mexico
-  const projection = useMemo(() => {
-    return d3Geo
-      .geoMercator()
-      .center([-102, 23.5]) // Center on Mexico
-      .scale(1400)
-      .translate([width / 2, height / 2]);
-  }, []);
-
-  // Path generator
-  const pathGenerator = useMemo(() => {
-    return d3Geo.geoPath().projection(projection);
-  }, [projection]);
-
-  // Get state name from feature properties
-  const getStateName = (feature: GeoFeature): string => {
-    const props = feature.properties;
-    const rawName =
-      props.name ||
-      props.NAME ||
-      props.ESTADO ||
-      props.state_name ||
-      props.NOM_ENT ||
-      "Unknown";
-    return stateNameMapping[rawName] || rawName;
-  };
-
-  // Get state data
-  const getStateData = (stateName: string) => {
-    return stateHomicideData.find((s) => s.name === stateName);
-  };
-
-  // Highlight codes mapping
   const highlightCodeToName: Record<string, string> = {
     MIC: "Michoacán",
     SIN: "Sinaloa",
@@ -178,6 +94,10 @@ function MexicoMapComponent({
     ZAC: "Zacatecas",
     BCN: "Baja California",
     SON: "Sonora",
+  };
+
+  const getStateData = (stateName: string) => {
+    return stateHomicideData.find((s) => s.name === stateName);
   };
 
   const getStateColor = (stateName: string) => {
@@ -196,8 +116,7 @@ function MexicoMapComponent({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!svgRef.current) return;
-    const rect = svgRef.current.getBoundingClientRect();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     setTooltipPos({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
@@ -210,41 +129,6 @@ function MexicoMapComponent({
     { label: "High (25-45)", color: "#7d4e2e" },
     { label: "Extreme (>45)", color: "#8b2500" },
   ];
-
-  if (loading) {
-    return (
-      <div className="w-full">
-        <div className="text-center mb-6">
-          <h3 className="font-serif text-2xl md:text-3xl text-foreground">
-            {title}
-          </h3>
-          <p className="text-muted-foreground mt-2">{subtitle}</p>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-8 flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-muted-foreground">Loading map data...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full">
-        <div className="text-center mb-6">
-          <h3 className="font-serif text-2xl md:text-3xl text-foreground">
-            {title}
-          </h3>
-          <p className="text-muted-foreground mt-2">{subtitle}</p>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-8 flex items-center justify-center min-h-[400px]">
-          <p className="text-red-500">{error}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <motion.div
@@ -263,75 +147,79 @@ function MexicoMapComponent({
       </div>
 
       {/* Map container */}
-      <div className="relative bg-card border border-border rounded-lg p-2 md:p-4 overflow-hidden">
-        {/* SVG Map */}
+      <div
+        className="relative bg-card border border-border rounded-lg p-2 md:p-4 overflow-hidden"
+        onMouseMove={handleMouseMove}
+      >
+        {/* SVG Map Grid */}
         <svg
-          ref={svgRef}
-          viewBox={`0 0 ${width} ${height}`}
+          viewBox="0 0 400 600"
           className="w-full h-auto"
-          style={{ maxHeight: "550px" }}
-          onMouseMove={handleMouseMove}
+          style={{ maxHeight: "550px", minHeight: "350px" }}
         >
           {/* Background */}
-          <rect x="0" y="0" width={width} height={height} fill="#0a0a0a" />
+          <rect x="0" y="0" width="400" height="600" fill="#0a0a0a" />
 
-          {/* Water/Ocean effect */}
-          <rect x="0" y="0" width={width} height={height} fill="#050508" />
+          {/* Water effect */}
+          <defs>
+            <pattern
+              id="water"
+              x="0"
+              y="0"
+              width="20"
+              height="20"
+              patternUnits="userSpaceOnUse"
+            >
+              <circle cx="10" cy="10" r="1" fill="#0d1117" opacity="0.3" />
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="400" height="600" fill="url(#water)" />
 
-          {/* States */}
-          <g>
-            {geoData.map((feature, index) => {
-              const stateName = getStateName(feature);
-              const isHovered = hoveredState === stateName;
-              const pathD = pathGenerator(
-                feature as d3Geo.GeoPermissibleObjects
-              );
+          {/* State boxes */}
+          {stateCoordinates.map((state, index) => {
+            const data = getStateData(state.name);
+            const isHovered = hoveredState === state.name;
+            const fillColor = getStateColor(state.name);
 
-              if (!pathD) return null;
-
-              return (
-                <motion.path
-                  key={`${stateName}-${index}`}
-                  d={pathD}
-                  fill={getStateColor(stateName)}
+            return (
+              <motion.g key={state.name}>
+                {/* State rectangle */}
+                <motion.rect
+                  x={state.x}
+                  y={state.y}
+                  width={state.width}
+                  height={state.height}
+                  fill={fillColor}
                   stroke={isHovered ? "#c9a84c" : "#333"}
-                  strokeWidth={isHovered ? 2 : 0.5}
+                  strokeWidth={isHovered ? 2 : 1}
+                  rx={2}
                   initial={{ opacity: 0 }}
-                  animate={
-                    isInView
-                      ? {
-                          opacity: 1,
-                          fill: getStateColor(stateName),
-                        }
-                      : {}
-                  }
+                  animate={isInView ? { opacity: 1 } : {}}
                   transition={{
                     duration: 0.6,
-                    delay: index * 0.015,
+                    delay: index * 0.02,
                   }}
-                  onMouseEnter={() => setHoveredState(stateName)}
+                  onMouseEnter={() => setHoveredState(state.name)}
                   onMouseLeave={() => setHoveredState(null)}
                   style={{ cursor: "pointer" }}
                 />
-              );
-            })}
-          </g>
 
-          {/* Country outline */}
-          {geoData.length > 0 && (
-            <path
-              d={
-                pathGenerator({
-                  type: "FeatureCollection",
-                  features: geoData,
-                } as d3Geo.GeoPermissibleObjects) || ""
-              }
-              fill="none"
-              stroke="#444"
-              strokeWidth={1.5}
-              pointerEvents="none"
-            />
-          )}
+                {/* State label */}
+                {state.width > 35 && (
+                  <text
+                    x={state.x + state.width / 2}
+                    y={state.y + state.height / 2}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    className="text-xs fill-foreground/60 pointer-events-none"
+                    fontSize="8"
+                  >
+                    {state.name.split(" ")[0]}
+                  </text>
+                )}
+              </motion.g>
+            );
+          })}
         </svg>
 
         {/* Tooltip */}
@@ -341,7 +229,7 @@ function MexicoMapComponent({
             animate={{ opacity: 1, scale: 1 }}
             className="absolute z-50 pointer-events-none"
             style={{
-              left: Math.min(tooltipPos.x + 15, width - 220),
+              left: Math.min(tooltipPos.x + 15, 400 - 220),
               top: Math.max(tooltipPos.y - 10, 10),
             }}
           >
