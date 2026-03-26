@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, memo } from "react";
+import { useState, memo, useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import * as d3Geo from "d3-geo";
 import { stateHomicideData, getViolenceLevelColor } from "@/lib/data";
 
 interface MexicoMapProps {
@@ -12,64 +12,45 @@ interface MexicoMapProps {
   showLegend?: boolean;
 }
 
-// Simplified state coordinates for D3-style visualization
-interface StateCoord {
-  name: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  region: string;
-}
-
-const stateCoordinates: StateCoord[] = [
-  // Northern Border states
-  { name: "Baja California", x: 20, y: 40, width: 50, height: 60, region: "NW" },
-  { name: "Sonora", x: 80, y: 35, width: 70, height: 80, region: "NW" },
-  { name: "Chihuahua", x: 90, y: 130, width: 80, height: 90, region: "N" },
-  { name: "Coahuila", x: 160, y: 120, width: 90, height: 100, region: "N" },
-  { name: "Nuevo León", x: 210, y: 110, width: 60, height: 80, region: "NE" },
-  { name: "Tamaulipas", x: 240, y: 80, width: 50, height: 100, region: "NE" },
-
-  // Central-North states
-  { name: "Durango", x: 110, y: 220, width: 60, height: 90, region: "NC" },
-  { name: "Zacatecas", x: 160, y: 240, width: 50, height: 60, region: "NC" },
-  { name: "San Luis Potosí", x: 200, y: 240, width: 60, height: 80, region: "NC" },
-
-  // West states
-  { name: "Sinaloa", x: 60, y: 150, width: 50, height: 90, region: "W" },
-  { name: "Nayarit", x: 70, y: 250, width: 40, height: 50, region: "W" },
-  { name: "Jalisco", x: 100, y: 310, width: 60, height: 70, region: "W" },
-  { name: "Colima", x: 90, y: 380, width: 30, height: 40, region: "W" },
-  { name: "Michoacán", x: 140, y: 340, width: 60, height: 70, region: "W" },
-
-  // Central states
-  { name: "Guanajuato", x: 160, y: 310, width: 50, height: 60, region: "C" },
-  { name: "Querétaro", x: 180, y: 280, width: 40, height: 50, region: "C" },
-  { name: "Hidalgo", x: 210, y: 290, width: 40, height: 60, region: "C" },
-  { name: "México", x: 220, y: 350, width: 40, height: 50, region: "C" },
-  { name: "Ciudad de México", x: 235, y: 375, width: 25, height: 25, region: "C" },
-  { name: "Tlaxcala", x: 250, y: 360, width: 25, height: 30, region: "C" },
-  { name: "Morelos", x: 230, y: 395, width: 30, height: 35, region: "C" },
-
-  // Eastern states
-  { name: "Veracruz", x: 250, y: 310, width: 55, height: 120, region: "E" },
-  { name: "Puebla", x: 240, y: 340, width: 50, height: 70, region: "E" },
-
-  // Southern states
-  { name: "Oaxaca", x: 220, y: 420, width: 70, height: 90, region: "S" },
-  { name: "Guerrero", x: 160, y: 420, width: 60, height: 80, region: "S" },
-  { name: "Chiapas", x: 230, y: 500, width: 70, height: 80, region: "S" },
-  { name: "Tabasco", x: 280, y: 450, width: 50, height: 60, region: "S" },
-
-  // Peninsula states
-  { name: "Yucatán", x: 340, y: 420, width: 50, height: 60, region: "P" },
-  { name: "Campeche", x: 300, y: 470, width: 60, height: 80, region: "P" },
-  { name: "Quintana Roo", x: 350, y: 480, width: 50, height: 80, region: "P" },
-
-  // Baja California Sur (isolated)
-  { name: "Baja California Sur", x: 30, y: 280, width: 40, height: 100, region: "NW" },
-];
+// Simplified GeoJSON for Mexico states (simplified coordinates from CONABIO)
+// Each state has coordinates in [longitude, latitude] format
+const mexicoStatesGeoJSON = {
+  type: "FeatureCollection",
+  features: [
+    { type: "Feature", properties: { name: "Aguascalientes", code: "01" }, geometry: { type: "Polygon", coordinates: [[[-102.7, 22.3], [-102.1, 22.3], [-102.1, 21.8], [-102.7, 21.8], [-102.7, 22.3]]] }},
+    { type: "Feature", properties: { name: "Baja California", code: "02" }, geometry: { type: "Polygon", coordinates: [[[-117.1, 32.5], [-114.7, 32.7], [-114.5, 32.1], [-113.1, 30.5], [-112.8, 28.8], [-114.1, 27.8], [-115.5, 28.3], [-116.1, 29.8], [-117.1, 32.5]]] }},
+    { type: "Feature", properties: { name: "Baja California Sur", code: "03" }, geometry: { type: "Polygon", coordinates: [[[-114.1, 27.8], [-112.8, 28.0], [-111.5, 26.5], [-110.3, 24.2], [-109.9, 23.0], [-110.5, 22.9], [-112.1, 24.5], [-113.1, 26.1], [-114.1, 27.8]]] }},
+    { type: "Feature", properties: { name: "Campeche", code: "04" }, geometry: { type: "Polygon", coordinates: [[[-90.4, 20.0], [-89.2, 19.8], [-89.1, 18.5], [-89.4, 17.8], [-90.5, 17.8], [-91.4, 18.5], [-90.4, 20.0]]] }},
+    { type: "Feature", properties: { name: "Coahuila", code: "05" }, geometry: { type: "Polygon", coordinates: [[[-103.4, 29.8], [-100.1, 29.8], [-100.1, 27.8], [-100.6, 26.8], [-101.4, 25.8], [-102.5, 25.0], [-103.8, 25.5], [-104.1, 27.0], [-103.4, 29.8]]] }},
+    { type: "Feature", properties: { name: "Colima", code: "06" }, geometry: { type: "Polygon", coordinates: [[[-104.7, 19.5], [-103.5, 19.5], [-103.5, 18.7], [-104.7, 18.7], [-104.7, 19.5]]] }},
+    { type: "Feature", properties: { name: "Chiapas", code: "07" }, geometry: { type: "Polygon", coordinates: [[[-94.1, 17.8], [-92.2, 17.8], [-91.4, 17.2], [-90.5, 16.1], [-91.4, 14.5], [-92.2, 14.5], [-93.5, 15.7], [-94.1, 16.2], [-94.1, 17.8]]] }},
+    { type: "Feature", properties: { name: "Chihuahua", code: "08" }, geometry: { type: "Polygon", coordinates: [[[-109.0, 31.8], [-106.5, 32.0], [-106.4, 31.4], [-104.9, 30.6], [-104.0, 29.3], [-104.4, 28.0], [-105.5, 26.7], [-106.5, 25.9], [-107.9, 26.3], [-108.2, 27.5], [-109.0, 29.4], [-109.0, 31.8]]] }},
+    { type: "Feature", properties: { name: "Ciudad de México", code: "09" }, geometry: { type: "Polygon", coordinates: [[[-99.4, 19.6], [-98.9, 19.6], [-98.9, 19.1], [-99.4, 19.1], [-99.4, 19.6]]] }},
+    { type: "Feature", properties: { name: "Durango", code: "10" }, geometry: { type: "Polygon", coordinates: [[[-107.2, 26.0], [-104.4, 26.0], [-103.5, 25.0], [-103.5, 23.5], [-104.5, 22.8], [-105.5, 23.1], [-106.9, 24.0], [-107.2, 26.0]]] }},
+    { type: "Feature", properties: { name: "Guanajuato", code: "11" }, geometry: { type: "Polygon", coordinates: [[[-102.1, 21.8], [-100.0, 21.8], [-100.0, 20.1], [-101.2, 20.0], [-102.1, 20.5], [-102.1, 21.8]]] }},
+    { type: "Feature", properties: { name: "Guerrero", code: "12" }, geometry: { type: "Polygon", coordinates: [[[-101.5, 18.5], [-98.5, 18.5], [-98.0, 17.4], [-98.5, 16.3], [-100.0, 16.7], [-101.5, 17.5], [-101.5, 18.5]]] }},
+    { type: "Feature", properties: { name: "Hidalgo", code: "13" }, geometry: { type: "Polygon", coordinates: [[[-99.8, 21.4], [-98.1, 21.4], [-98.1, 19.8], [-99.0, 19.8], [-99.8, 20.3], [-99.8, 21.4]]] }},
+    { type: "Feature", properties: { name: "Jalisco", code: "14" }, geometry: { type: "Polygon", coordinates: [[[-105.7, 22.5], [-103.5, 22.5], [-102.5, 21.5], [-102.5, 19.5], [-103.5, 19.1], [-105.0, 19.3], [-105.7, 20.5], [-105.7, 22.5]]] }},
+    { type: "Feature", properties: { name: "México", code: "15" }, geometry: { type: "Polygon", coordinates: [[[-100.4, 20.2], [-98.6, 20.2], [-98.6, 18.8], [-99.5, 18.6], [-100.4, 19.1], [-100.4, 20.2]]] }},
+    { type: "Feature", properties: { name: "Michoacán", code: "16" }, geometry: { type: "Polygon", coordinates: [[[-103.7, 20.4], [-101.0, 20.4], [-100.1, 19.2], [-100.8, 18.1], [-102.0, 17.9], [-103.5, 18.3], [-103.7, 19.4], [-103.7, 20.4]]] }},
+    { type: "Feature", properties: { name: "Morelos", code: "17" }, geometry: { type: "Polygon", coordinates: [[[-99.5, 19.1], [-98.6, 19.1], [-98.6, 18.4], [-99.5, 18.4], [-99.5, 19.1]]] }},
+    { type: "Feature", properties: { name: "Nayarit", code: "18" }, geometry: { type: "Polygon", coordinates: [[[-106.0, 23.1], [-104.5, 23.1], [-104.3, 21.5], [-105.2, 20.6], [-106.0, 21.5], [-106.0, 23.1]]] }},
+    { type: "Feature", properties: { name: "Nuevo León", code: "19" }, geometry: { type: "Polygon", coordinates: [[[-101.2, 27.8], [-99.0, 27.8], [-99.0, 25.8], [-99.7, 24.5], [-100.6, 23.2], [-101.2, 24.0], [-101.2, 27.8]]] }},
+    { type: "Feature", properties: { name: "Oaxaca", code: "20" }, geometry: { type: "Polygon", coordinates: [[[-98.5, 18.2], [-95.5, 18.2], [-94.8, 16.5], [-95.5, 15.7], [-97.8, 15.8], [-98.5, 16.5], [-98.5, 18.2]]] }},
+    { type: "Feature", properties: { name: "Puebla", code: "21" }, geometry: { type: "Polygon", coordinates: [[[-98.6, 20.2], [-96.8, 20.2], [-96.8, 18.1], [-97.5, 17.9], [-98.6, 18.4], [-98.6, 20.2]]] }},
+    { type: "Feature", properties: { name: "Querétaro", code: "22" }, geometry: { type: "Polygon", coordinates: [[[-100.6, 21.6], [-99.5, 21.6], [-99.5, 20.5], [-100.6, 20.5], [-100.6, 21.6]]] }},
+    { type: "Feature", properties: { name: "Quintana Roo", code: "23" }, geometry: { type: "Polygon", coordinates: [[[-89.2, 21.5], [-86.7, 21.5], [-86.7, 18.5], [-87.5, 17.9], [-89.2, 17.9], [-89.2, 21.5]]] }},
+    { type: "Feature", properties: { name: "San Luis Potosí", code: "24" }, geometry: { type: "Polygon", coordinates: [[[-102.3, 24.5], [-98.8, 24.5], [-98.8, 21.2], [-100.5, 21.2], [-102.3, 22.0], [-102.3, 24.5]]] }},
+    { type: "Feature", properties: { name: "Sinaloa", code: "25" }, geometry: { type: "Polygon", coordinates: [[[-109.4, 27.0], [-106.4, 27.0], [-105.5, 25.5], [-105.5, 23.2], [-106.5, 22.5], [-108.5, 23.5], [-109.4, 25.5], [-109.4, 27.0]]] }},
+    { type: "Feature", properties: { name: "Sonora", code: "26" }, geometry: { type: "Polygon", coordinates: [[[-114.8, 32.5], [-109.0, 32.0], [-109.0, 29.5], [-108.2, 27.5], [-109.5, 26.3], [-111.0, 26.0], [-113.0, 28.5], [-114.8, 30.5], [-114.8, 32.5]]] }},
+    { type: "Feature", properties: { name: "Tabasco", code: "27" }, geometry: { type: "Polygon", coordinates: [[[-94.1, 18.6], [-91.5, 18.6], [-91.5, 17.3], [-93.0, 17.3], [-94.1, 17.8], [-94.1, 18.6]]] }},
+    { type: "Feature", properties: { name: "Tamaulipas", code: "28" }, geometry: { type: "Polygon", coordinates: [[[-100.1, 27.8], [-97.1, 26.0], [-97.1, 23.0], [-98.5, 22.2], [-99.7, 22.5], [-100.1, 24.0], [-100.1, 27.8]]] }},
+    { type: "Feature", properties: { name: "Tlaxcala", code: "29" }, geometry: { type: "Polygon", coordinates: [[[-98.4, 19.7], [-97.6, 19.7], [-97.6, 19.1], [-98.4, 19.1], [-98.4, 19.7]]] }},
+    { type: "Feature", properties: { name: "Veracruz", code: "30" }, geometry: { type: "Polygon", coordinates: [[[-98.5, 22.5], [-96.4, 22.0], [-94.8, 19.5], [-94.5, 18.0], [-95.2, 17.2], [-96.5, 17.5], [-97.5, 18.5], [-98.2, 20.5], [-98.5, 22.5]]] }},
+    { type: "Feature", properties: { name: "Yucatán", code: "31" }, geometry: { type: "Polygon", coordinates: [[[-90.4, 21.6], [-87.5, 21.6], [-87.5, 20.5], [-89.2, 19.7], [-90.4, 20.0], [-90.4, 21.6]]] }},
+    { type: "Feature", properties: { name: "Zacatecas", code: "32" }, geometry: { type: "Polygon", coordinates: [[[-104.4, 25.1], [-102.0, 25.1], [-101.8, 23.5], [-102.7, 22.0], [-103.5, 21.8], [-104.4, 22.8], [-104.4, 25.1]]] }},
+  ]
+};
 
 function MexicoMapComponent({
   title = "Violence Across Mexico",
@@ -78,9 +59,37 @@ function MexicoMapComponent({
   showLegend = true,
 }: MexicoMapProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-10%" });
   const [hoveredState, setHoveredState] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const [paths, setPaths] = useState<{ name: string; d: string; code: string }[]>([]);
+
+  // D3.js projection for Mexico - Conic Conformal projection centered on Mexico
+  useEffect(() => {
+    const width = 800;
+    const height = 600;
+
+    // Create projection centered on Mexico
+    const projection = d3Geo.geoConicConformal()
+      .rotate([102, 0])
+      .center([0, 24])
+      .parallels([17.5, 29.5])
+      .scale(2000)
+      .translate([width / 2, height / 2]);
+
+    // Create path generator
+    const pathGenerator = d3Geo.geoPath().projection(projection);
+
+    // Generate paths for each state
+    const generatedPaths = mexicoStatesGeoJSON.features.map((feature) => ({
+      name: feature.properties.name,
+      code: feature.properties.code,
+      d: pathGenerator(feature as d3Geo.GeoPermissibleObjects) || "",
+    }));
+
+    setPaths(generatedPaths);
+  }, []);
 
   const highlightCodeToName: Record<string, string> = {
     MIC: "Michoacán",
@@ -124,10 +133,10 @@ function MexicoMapComponent({
   };
 
   const legendItems = [
-    { label: "Low (<10)", color: "#1a2e1a" },
-    { label: "Medium (10-25)", color: "#4a3728" },
-    { label: "High (25-45)", color: "#7d4e2e" },
-    { label: "Extreme (>45)", color: "#8b2500" },
+    { label: "Low (<10)", color: "#1a3d1a" },
+    { label: "Medium (10-25)", color: "#5c4a28" },
+    { label: "High (25-45)", color: "#8b5a2b" },
+    { label: "Extreme (>45)", color: "#a02c2c" },
   ];
 
   return (
@@ -139,7 +148,7 @@ function MexicoMapComponent({
       className="w-full"
     >
       {/* Header */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-8">
         <h3 className="font-serif text-2xl md:text-3xl text-foreground">
           {title}
         </h3>
@@ -148,92 +157,100 @@ function MexicoMapComponent({
 
       {/* Map container */}
       <div
-        className="relative bg-card border border-border rounded-lg p-2 md:p-4 overflow-hidden"
+        className="relative bg-gradient-to-b from-card to-background border border-border rounded-xl p-4 md:p-6 overflow-hidden shadow-2xl"
         onMouseMove={handleMouseMove}
       >
-        {/* SVG Map Grid */}
+        {/* Ocean background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-xl" />
+        
+        {/* SVG Map */}
         <svg
-          viewBox="0 0 400 600"
-          className="w-full h-auto"
-          style={{ maxHeight: "550px", minHeight: "350px" }}
+          ref={svgRef}
+          viewBox="0 0 800 600"
+          className="relative w-full h-auto z-10"
+          style={{ maxHeight: "600px", minHeight: "400px" }}
         >
-          {/* Background */}
-          <rect x="0" y="0" width="400" height="600" fill="#0a0a0a" />
-
-          {/* Water effect */}
+          {/* Gradient definitions */}
           <defs>
-            <pattern
-              id="water"
-              x="0"
-              y="0"
-              width="20"
-              height="20"
-              patternUnits="userSpaceOnUse"
-            >
-              <circle cx="10" cy="10" r="1" fill="#0d1117" opacity="0.3" />
-            </pattern>
+            <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#0c1222" />
+              <stop offset="100%" stopColor="#0a0f1a" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="shadow">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.5"/>
+            </filter>
           </defs>
-          <rect x="0" y="0" width="400" height="600" fill="url(#water)" />
 
-          {/* State boxes */}
-          {stateCoordinates.map((state, index) => {
-            const data = getStateData(state.name);
-            const isHovered = hoveredState === state.name;
-            const fillColor = getStateColor(state.name);
+          {/* Ocean background */}
+          <rect x="0" y="0" width="800" height="600" fill="url(#oceanGradient)" />
 
-            return (
-              <motion.g key={state.name}>
-                {/* State rectangle */}
-                <motion.rect
-                  x={state.x}
-                  y={state.y}
-                  width={state.width}
-                  height={state.height}
+          {/* State paths */}
+          <g filter="url(#shadow)">
+            {paths.map((state, index) => {
+              const data = getStateData(state.name);
+              const isHovered = hoveredState === state.name;
+              const fillColor = getStateColor(state.name);
+
+              return (
+                <motion.path
+                  key={state.name}
+                  d={state.d}
                   fill={fillColor}
-                  stroke={isHovered ? "#c9a84c" : "#333"}
-                  strokeWidth={isHovered ? 2 : 1}
-                  rx={2}
-                  initial={{ opacity: 0 }}
-                  animate={isInView ? { opacity: 1 } : {}}
+                  stroke={isHovered ? "#c9a84c" : "#2a2a2a"}
+                  strokeWidth={isHovered ? 2.5 : 1}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={isInView ? { opacity: 1, scale: 1 } : {}}
                   transition={{
-                    duration: 0.6,
-                    delay: index * 0.02,
+                    duration: 0.5,
+                    delay: index * 0.03,
+                    ease: "easeOut",
                   }}
                   onMouseEnter={() => setHoveredState(state.name)}
                   onMouseLeave={() => setHoveredState(null)}
-                  style={{ cursor: "pointer" }}
+                  style={{ 
+                    cursor: "pointer",
+                    filter: isHovered ? "url(#glow)" : "none",
+                    transform: isHovered ? "scale(1.02)" : "scale(1)",
+                    transformOrigin: "center",
+                    transition: "transform 0.2s ease, stroke 0.2s ease"
+                  }}
                 />
+              );
+            })}
+          </g>
 
-                {/* State label */}
-                {state.width > 35 && (
-                  <text
-                    x={state.x + state.width / 2}
-                    y={state.y + state.height / 2}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    className="text-xs fill-foreground/60 pointer-events-none"
-                    fontSize="8"
-                  >
-                    {state.name.split(" ")[0]}
-                  </text>
-                )}
-              </motion.g>
-            );
-          })}
+          {/* Country label */}
+          <text
+            x="400"
+            y="560"
+            textAnchor="middle"
+            className="fill-muted-foreground/30 font-serif text-sm uppercase tracking-[0.3em]"
+            fontSize="14"
+          >
+            Mexico
+          </text>
         </svg>
 
         {/* Tooltip */}
         {hoveredState && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9 }}
             className="absolute z-50 pointer-events-none"
             style={{
-              left: Math.min(tooltipPos.x + 15, 400 - 220),
+              left: Math.min(Math.max(tooltipPos.x + 15, 10), 600),
               top: Math.max(tooltipPos.y - 10, 10),
             }}
           >
-            <div className="bg-background/95 backdrop-blur border border-border rounded-lg p-4 shadow-xl min-w-[200px]">
+            <div className="bg-background/95 backdrop-blur-md border border-primary/30 rounded-lg p-4 shadow-2xl min-w-[220px]">
               {(() => {
                 const data = getStateData(hoveredState);
                 if (!data)
@@ -242,57 +259,54 @@ function MexicoMapComponent({
                   );
                 return (
                   <>
-                    <p className="font-serif text-lg text-foreground font-semibold">
+                    <p className="font-serif text-lg text-foreground font-semibold border-b border-border pb-2 mb-3">
                       {data.name}
                     </p>
-                    <div className="mt-2 space-y-1">
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">
-                          Homicide Rate:
-                        </span>{" "}
-                        <span className="text-primary font-mono font-bold">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Homicide Rate:</span>
+                        <span className="text-primary font-mono font-bold text-lg">
                           {data.homicideRate}
+                          <span className="text-xs text-muted-foreground ml-1">/100k</span>
                         </span>
-                        <span className="text-muted-foreground text-xs">
-                          {" "}
-                          /100k
-                        </span>
-                      </p>
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">
-                          Total Homicides:
-                        </span>{" "}
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Total Deaths:</span>
                         <span className="text-foreground font-mono">
                           {data.totalHomicides.toLocaleString()}
                         </span>
-                      </p>
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">
-                          Violence Level:
-                        </span>{" "}
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Level:</span>
                         <span
-                          className={`font-semibold ${
+                          className={`font-semibold text-sm px-2 py-0.5 rounded ${
                             data.violenceLevel === "extreme"
-                              ? "text-red-500"
+                              ? "bg-red-500/20 text-red-400"
                               : data.violenceLevel === "high"
-                                ? "text-orange-500"
+                                ? "bg-orange-500/20 text-orange-400"
                                 : data.violenceLevel === "medium"
-                                  ? "text-yellow-500"
-                                  : "text-green-500"
+                                  ? "bg-yellow-500/20 text-yellow-400"
+                                  : "bg-green-500/20 text-green-400"
                           }`}
                         >
-                          {data.violenceLevel.charAt(0).toUpperCase() +
-                            data.violenceLevel.slice(1)}
+                          {data.violenceLevel.toUpperCase()}
                         </span>
-                      </p>
+                      </div>
                       {data.cartelPresence.length > 0 && (
-                        <div className="pt-1 border-t border-border mt-2">
-                          <p className="text-xs text-muted-foreground">
-                            Cartel Presence:
+                        <div className="pt-2 border-t border-border mt-2">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                            Active Cartels
                           </p>
-                          <p className="text-xs text-foreground">
-                            {data.cartelPresence.join(", ")}
-                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {data.cartelPresence.map((cartel) => (
+                              <span
+                                key={cartel}
+                                className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded"
+                              >
+                                {cartel}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -305,76 +319,94 @@ function MexicoMapComponent({
 
         {/* Legend */}
         {showLegend && (
-          <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur border border-border rounded-lg p-3">
-            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider font-mono">
-              Homicides per 100k
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="absolute bottom-6 left-6 bg-background/90 backdrop-blur-md border border-border rounded-lg p-4 shadow-xl"
+          >
+            <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider font-mono font-semibold">
+              Deaths per 100k
             </p>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {legendItems.map(({ label, color }) => (
-                <div key={label} className="flex items-center gap-2">
+                <div key={label} className="flex items-center gap-3">
                   <div
-                    className="w-5 h-3 rounded-sm border border-white/10"
+                    className="w-6 h-4 rounded border border-white/10 shadow-inner"
                     style={{ backgroundColor: color }}
                   />
-                  <span className="text-xs text-muted-foreground">{label}</span>
+                  <span className="text-xs text-foreground/80">{label}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
-        {/* Source label */}
-        <div className="absolute bottom-4 right-4 text-xs text-muted-foreground/50 font-mono">
-          Data: INEGI 2023
+        {/* Data source */}
+        <div className="absolute bottom-6 right-6 text-xs text-muted-foreground/40 font-mono">
+          Source: INEGI 2023
         </div>
       </div>
 
-      {/* Stats summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-        <div className="text-center p-4 bg-card border border-border rounded-lg">
-          <p className="font-mono text-2xl md:text-3xl text-primary font-bold">
-            {
-              stateHomicideData.filter((s) => s.violenceLevel === "extreme")
-                .length
-            }
+      {/* Stats grid below map */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.6 }}
+          className="text-center p-5 bg-gradient-to-br from-red-950/30 to-card border border-red-900/30 rounded-xl"
+        >
+          <p className="font-mono text-3xl md:text-4xl text-red-400 font-bold">
+            {stateHomicideData.filter((s) => s.violenceLevel === "extreme").length}
           </p>
-          <p className="text-xs text-muted-foreground uppercase mt-1 tracking-wide">
-            Extreme Violence
+          <p className="text-xs text-muted-foreground uppercase mt-2 tracking-wide">
+            Extreme Violence States
           </p>
-        </div>
-        <div className="text-center p-4 bg-card border border-border rounded-lg">
-          <p className="font-mono text-2xl md:text-3xl text-foreground font-bold">
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.7 }}
+          className="text-center p-5 bg-card border border-border rounded-xl"
+        >
+          <p className="font-mono text-3xl md:text-4xl text-foreground font-bold">
             {Math.round(
               stateHomicideData.reduce((sum, s) => sum + s.homicideRate, 0) /
                 stateHomicideData.length
             )}
           </p>
-          <p className="text-xs text-muted-foreground uppercase mt-1 tracking-wide">
-            Avg Rate /100k
+          <p className="text-xs text-muted-foreground uppercase mt-2 tracking-wide">
+            National Avg Rate
           </p>
-        </div>
-        <div className="text-center p-4 bg-card border border-border rounded-lg">
-          <p className="font-mono text-2xl md:text-3xl text-foreground font-bold">
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.8 }}
+          className="text-center p-5 bg-card border border-border rounded-xl"
+        >
+          <p className="font-mono text-3xl md:text-4xl text-foreground font-bold">
             {stateHomicideData
               .reduce((sum, s) => sum + s.totalHomicides, 0)
               .toLocaleString()}
           </p>
-          <p className="text-xs text-muted-foreground uppercase mt-1 tracking-wide">
-            Total 2023
+          <p className="text-xs text-muted-foreground uppercase mt-2 tracking-wide">
+            Total Deaths 2023
           </p>
-        </div>
-        <div className="text-center p-4 bg-card border border-border rounded-lg">
-          <p className="font-mono text-2xl md:text-3xl text-primary font-bold">
-            {
-              stateHomicideData.filter((s) =>
-                s.cartelPresence.includes("CJNG")
-              ).length
-            }
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.9 }}
+          className="text-center p-5 bg-gradient-to-br from-primary/10 to-card border border-primary/30 rounded-xl"
+        >
+          <p className="font-mono text-3xl md:text-4xl text-primary font-bold">
+            {stateHomicideData.filter((s) => s.cartelPresence.includes("CJNG")).length}
           </p>
-          <p className="text-xs text-muted-foreground uppercase mt-1 tracking-wide">
-            CJNG States
+          <p className="text-xs text-muted-foreground uppercase mt-2 tracking-wide">
+            CJNG Presence
           </p>
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );
