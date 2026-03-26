@@ -12,7 +12,7 @@ import { ConclusionSection } from "@/components/sections/conclusion-section";
 export default function Home() {
   return (
     <ScrollProvider totalSections={7}>
-      <main className="relative">
+      <main className="relative w-full">
         {/* Section 0: The Hook - El Mencho's Death */}
         <HeroSection />
 

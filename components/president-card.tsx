@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import type { President } from "@/lib/data";
 
@@ -34,19 +35,16 @@ export function PresidentCard({ president, index }: PresidentCardProps) {
       className={`border ${partyColors[president.party]} p-6 md:p-8`}
     >
       <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-        {/* Photo placeholder */}
+        {/* Photo */}
         <div className="w-full md:w-48 flex-shrink-0">
-          <div className="aspect-[3/4] bg-muted relative overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <p className="font-serif text-2xl text-muted-foreground">
-                  {president.shortName}
-                </p>
-                <p className={`font-mono text-sm ${partyTextColors[president.party]}`}>
-                  {president.party}
-                </p>
-              </div>
-            </div>
+          <div className="aspect-[3/4] bg-muted relative overflow-hidden border border-border photo-frame">
+            <Image
+              src={president.imageUrl}
+              alt={`${president.name} - President of Mexico (${president.years})`}
+              fill
+              className="object-cover w-full h-full"
+              quality={75}
+            />
           </div>
         </div>
 

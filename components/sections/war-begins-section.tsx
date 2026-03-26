@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { MexicoMap } from "@/components/charts/mexico-map";
 import { InlineCounter } from "@/components/death-counter";
@@ -46,9 +47,31 @@ export function WarBeginsSection() {
 
         {/* Split content */}
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left: The story */}
+          {/* Left: Military operations image */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative"
+          >
+            <div className="relative aspect-video bg-muted border border-border overflow-hidden photo-frame">
+              <Image
+                src="/images/military-silhouette.jpg"
+                alt="Mexican military deployment during Calderón's drug war"
+                fill
+                className="object-cover w-full h-full"
+                quality={75}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-4 italic">
+              Mexican military operations expanded dramatically under Calderón&apos;s &ldquo;Kingpin Strategy,&rdquo;
+              leading to an unprecedented surge in violence and civilian casualties.
+            </p>
+          </motion.div>
+
+          {/* Right: The story and map */}
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="space-y-6"
@@ -102,20 +125,21 @@ export function WarBeginsSection() {
               </cite>
             </blockquote>
           </motion.div>
-
-          {/* Right: Map visualization */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <MexicoMap
-              title="Violence Hotspots by 2012"
-              subtitle="States with highest cartel activity"
-              highlightStates={["MIC", "SIN", "CHH", "TAM", "GRO", "JAL"]}
-            />
-          </motion.div>
         </div>
+
+        {/* Full-width Mexico map below */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mt-24"
+        >
+          <MexicoMap
+            title="Violence Hotspots by 2012"
+            subtitle="States with highest cartel activity during Calderón era"
+            highlightStates={["MIC", "SIN", "CHH", "TAM", "GRO", "JAL"]}
+          />
+        </motion.div>
 
         {/* Consequence callout */}
         <motion.div

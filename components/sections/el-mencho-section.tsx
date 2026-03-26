@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import Image from "next/image";
 import { elMenchoTimeline } from "@/lib/data";
 
 export function ElMenchoSection() {
@@ -41,27 +42,22 @@ export function ElMenchoSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <div className="aspect-[3/4] bg-muted border border-border relative overflow-hidden">
-              {/* Placeholder for El Mencho photo */}
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted to-card">
-                <div className="text-center p-8">
-                  <p className="font-mono text-primary text-6xl mb-4">$10M</p>
-                  <p className="text-muted-foreground text-sm uppercase tracking-widest">
-                    DEA Reward
-                  </p>
-                  <p className="text-muted-foreground text-xs mt-2">
-                    Most wanted fugitive
-                  </p>
-                </div>
-              </div>
-              {/* Red border accent */}
+            <div className="aspect-[3/4] bg-muted border border-border relative overflow-hidden photo-frame">
+              <Image
+                src="/images/el-mencho-silhouette.jpg"
+                alt="El Mencho - Nemesio Oseguera Cervantes"
+                fill
+                className="object-cover w-full h-full"
+                priority
+              />
+              {/* Border accent */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary" />
             </div>
             
             {/* Caption */}
             <p className="text-sm text-muted-foreground mt-4 italic">
-              El Mencho evaded capture for over a decade. He died from kidney failure 
-              while on the run, according to Mexican intelligence officials.
+              Nemesio Oseguera Cervantes (1966-2026). El Mencho evaded capture for over a decade. 
+              He died from kidney failure while on the run.
             </p>
           </motion.div>
 

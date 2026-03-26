@@ -1,36 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  /* Core palette - Dark cinematic theme with blood red accent */
-  --background: #0a0a0a;
-  --foreground: #e8e8e8;
-  
+  /* Journalistic dark theme — NYT/Reuters inspired */
+  --background: #0d0d0d;
+  --foreground: #e2ddd6;
+
   /* Neutrals */
-  --muted: #1a1a1a;
-  --muted-foreground: #a0a0a0;
-  --card: #111111;
-  --card-foreground: #e8e8e8;
-  --border: #262626;
-  
-  /* Accent colors */
-  --primary: #8b0000;
-  --primary-foreground: #ffffff;
-  --accent: #b91c1c;
-  --accent-foreground: #ffffff;
-  
-  /* Chart colors */
-  --chart-1: #8b0000;
-  --chart-2: #b91c1c;
-  --chart-3: #dc2626;
-  --chart-4: #ef4444;
-  --chart-5: #f87171;
-  
-  /* Semantic colors */
-  --destructive: #7f1d1d;
-  --destructive-foreground: #fecaca;
-  
+  --muted: #1c1b19;
+  --muted-foreground: #8c8880;
+  --card: #151412;
+  --card-foreground: #e2ddd6;
+  --border: #2a2825;
+
+  /* Accent — warm amber, not aggressive red */
+  --primary: #c9a84c;
+  --primary-foreground: #0d0d0d;
+  --accent: #a8723a;
+  --accent-foreground: #0d0d0d;
+
+  /* Chart colors — warm journalistic palette */
+  --chart-1: #c9a84c;
+  --chart-2: #a8723a;
+  --chart-3: #8b4513;
+  --chart-4: #6b3410;
+  --chart-5: #4a2408;
+
+  /* Semantic */
+  --destructive: #7a3b1e;
+  --destructive-foreground: #f5cba7;
+
   /* Radius */
-  --radius: 0.25rem;
+  --radius: 0.125rem;
 }
 
 @theme inline {
@@ -53,15 +53,16 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --radius: var(--radius);
-  
+
   /* Typography */
   --font-serif: var(--font-playfair), 'Playfair Display', Georgia, serif;
   --font-sans: var(--font-source-sans), 'Source Sans 3', system-ui, sans-serif;
 }
 
-/* Base styles */
+/* Base */
 html {
   scroll-behavior: smooth;
+  position: relative;
 }
 
 body {
@@ -70,91 +71,60 @@ body {
   font-family: var(--font-sans);
   line-height: 1.6;
   overflow-x: hidden;
+  position: relative;
 }
 
-/* Selection styling */
 ::selection {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--muted); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
 
-::-webkit-scrollbar-track {
-  background: var(--muted);
-}
+/* Utilities */
+.text-balance { text-wrap: balance; }
+.text-pretty { text-wrap: pretty; }
 
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
-}
-
-/* Typography utilities */
-.text-balance {
-  text-wrap: balance;
-}
-
-.text-pretty {
-  text-wrap: pretty;
-}
-
-/* Scroll-triggered animation utilities */
 .fade-in-up {
   opacity: 0;
   transform: translateY(40px);
   transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
-
 .fade-in-up.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Cinematic text shadow for headings */
+/* Journalistic heading style — warm amber glow */
 .text-cinematic {
-  text-shadow: 0 2px 20px rgba(139, 0, 0, 0.3);
+  text-shadow: 0 2px 24px rgba(201, 168, 76, 0.18);
 }
 
-/* Blood drip effect for decorative elements */
-.blood-drip {
-  background: linear-gradient(180deg, var(--primary) 0%, transparent 100%);
+/* Animated pulse for counters */
+@keyframes pulse-amber {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.65; }
 }
-
-/* Pulse animation for counters */
-@keyframes pulse-red {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
 .animate-pulse-red {
-  animation: pulse-red 2s ease-in-out infinite;
+  animation: pulse-amber 2.2s ease-in-out infinite;
 }
 
-/* Grain overlay for cinematic effect */
+/* Film grain overlay */
 .grain-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   pointer-events: none;
   z-index: 1000;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
-/* Chart container styles */
+/* Chart container */
 .chart-container {
   background: var(--card);
   border: 1px solid var(--border);
@@ -162,7 +132,7 @@ body {
   padding: 1.5rem;
 }
 
-/* Sticky section for scrollytelling */
+/* Sticky section */
 .sticky-section {
   position: sticky;
   top: 0;
@@ -172,13 +142,25 @@ body {
   justify-content: center;
 }
 
-/* Progress bar styles */
+/* Progress bar */
 .progress-bar {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
+  top: 0; left: 0;
+  height: 2px;
   background: var(--primary);
   z-index: 100;
   transition: width 0.1s linear;
+}
+
+/* Photo frame — editorial style */
+.photo-frame {
+  position: relative;
+  overflow: hidden;
+}
+.photo-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { InlineCounter } from "@/components/death-counter";
 import { cartels } from "@/lib/data";
@@ -33,35 +34,60 @@ export function CJNGRiseSection() {
           </p>
         </motion.div>
 
-        {/* CJNG Stats Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="grid md:grid-cols-3 gap-6 mb-16"
-        >
-          <div className="bg-card border border-primary/50 p-8 text-center">
-            <p className="font-mono text-5xl md:text-6xl text-primary font-bold">
-              <InlineCounter value={35} suffix="+" />
+        {/* CJNG Stats Grid with Image */}
+        <div className="grid lg:grid-cols-2 gap-12 items-start mb-16">
+          {/* Image */}
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative"
+          >
+            <div className="relative aspect-video bg-muted border border-border overflow-hidden photo-frame">
+              <Image
+                src="/images/cartel-infographic.jpg"
+                alt="CJNG cartel network and organizational structure"
+                fill
+                className="object-cover w-full h-full"
+                quality={75}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-4 italic">
+              CJNG's sophisticated network spans 35 Mexican states and 50+ countries worldwide,
+              making it the most powerful criminal organization in the Western Hemisphere.
             </p>
-            <p className="text-foreground mt-2">Mexican States</p>
-            <p className="text-muted-foreground text-sm">Active presence</p>
-          </div>
-          <div className="bg-card border border-border p-8 text-center">
-            <p className="font-mono text-5xl md:text-6xl text-primary font-bold">
-              <InlineCounter value={50} suffix="+" />
-            </p>
-            <p className="text-foreground mt-2">Countries</p>
-            <p className="text-muted-foreground text-sm">Global operations</p>
-          </div>
-          <div className="bg-card border border-border p-8 text-center">
-            <p className="font-mono text-5xl md:text-6xl text-foreground font-bold">
-              $10M
-            </p>
-            <p className="text-foreground mt-2">DEA Bounty</p>
-            <p className="text-muted-foreground text-sm">For El Mencho</p>
-          </div>
-        </motion.div>
+          </motion.div>
+
+          {/* Stats Grid */}
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="space-y-6"
+          >
+            <div className="bg-card border border-primary/50 p-8 text-center">
+              <p className="font-mono text-5xl md:text-6xl text-primary font-bold">
+                <InlineCounter value={35} suffix="+" />
+              </p>
+              <p className="text-foreground mt-2">Mexican States</p>
+              <p className="text-muted-foreground text-sm">Active presence</p>
+            </div>
+            <div className="bg-card border border-border p-8 text-center">
+              <p className="font-mono text-5xl md:text-6xl text-primary font-bold">
+                <InlineCounter value={50} suffix="+" />
+              </p>
+              <p className="text-foreground mt-2">Countries</p>
+              <p className="text-muted-foreground text-sm">Global operations</p>
+            </div>
+            <div className="bg-card border border-border p-8 text-center">
+              <p className="font-mono text-5xl md:text-6xl text-foreground font-bold">
+                $10M
+              </p>
+              <p className="text-foreground mt-2">DEA Bounty</p>
+              <p className="text-muted-foreground text-sm">For El Mencho</p>
+            </div>
+          </motion.div>
+        </div>
 
         {/* Timeline of CJNG Rise */}
         <motion.div

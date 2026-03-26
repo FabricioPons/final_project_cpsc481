@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { DeathCounter, InlineCounter } from "@/components/death-counter";
 import { statistics } from "@/lib/data";
@@ -59,19 +60,43 @@ export function ConclusionSection() {
         </motion.div>
       </div>
 
-      {/* The question */}
-      <div className="max-w-4xl mx-auto px-6 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-center"
-        >
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground leading-tight">
-            El Mencho is dead.<br />
-            But the war continues.
-          </h2>
-        </motion.div>
+      {/* The question with memorial image */}
+      <div className="max-w-6xl mx-auto px-6 py-16">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Image */}
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="relative"
+          >
+            <div className="relative aspect-video bg-muted border border-border overflow-hidden photo-frame">
+              <Image
+                src="/images/memorial-candles.jpg"
+                alt="Memorial vigil for victims of Mexico's drug war"
+                fill
+                className="object-cover w-full h-full"
+                quality={75}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-4 italic">
+              Memorial vigils remember the hundreds of thousands lost to violence.
+              Each flame represents a life, a family, a community shattered.
+            </p>
+          </motion.div>
+
+          {/* Text */}
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground leading-tight mb-8">
+              El Mencho is dead.<br />
+              But the war continues.
+            </h2>
+          </motion.div>
+        </div>
       </div>
 
       {/* What comes next */}
