@@ -6,55 +6,53 @@ import * as d3Geo from "d3-geo";
 import * as topojson from "topojson-client";
 import { stateHomicideData, getViolenceLevelColor } from "@/lib/data";
 
-// D3.js-based Mexico map with real INEGI data
-
 // TopoJSON URL for Mexico states (official INEGI data)
 const MEXICO_TOPOJSON_URL =
-  "https://raw.githubusercontent.com/angelnmara/geojson/refs/heads/master/mexicoHigh.json";
+  "https://raw.githubusercontent.com/angelnmara/geojson/master/mexicoHigh.json";
 
 // State name mapping from GeoJSON properties to our data
 const stateNameMapping: Record<string, string> = {
-  "Aguascalientes": "Aguascalientes",
+  Aguascalientes: "Aguascalientes",
   "Baja California": "Baja California",
   "Baja California Sur": "Baja California Sur",
-  "Campeche": "Campeche",
-  "Chiapas": "Chiapas",
-  "Chihuahua": "Chihuahua",
+  Campeche: "Campeche",
+  Chiapas: "Chiapas",
+  Chihuahua: "Chihuahua",
   "Coahuila de Zaragoza": "Coahuila",
-  "Coahuila": "Coahuila",
-  "Colima": "Colima",
+  Coahuila: "Coahuila",
+  Colima: "Colima",
   "Ciudad de México": "Ciudad de México",
   "Distrito Federal": "Ciudad de México",
-  "Durango": "Durango",
-  "Guanajuato": "Guanajuato",
-  "Guerrero": "Guerrero",
-  "Hidalgo": "Hidalgo",
-  "Jalisco": "Jalisco",
-  "México": "México",
-  "Mexico": "México",
+  Durango: "Durango",
+  Guanajuato: "Guanajuato",
+  Guerrero: "Guerrero",
+  Hidalgo: "Hidalgo",
+  Jalisco: "Jalisco",
+  México: "México",
+  Mexico: "México",
   "Estado de México": "México",
   "Michoacán de Ocampo": "Michoacán",
-  "Michoacán": "Michoacán",
-  "Morelos": "Morelos",
-  "Nayarit": "Nayarit",
+  Michoacán: "Michoacán",
+  Morelos: "Morelos",
+  Nayarit: "Nayarit",
   "Nuevo León": "Nuevo León",
-  "Oaxaca": "Oaxaca",
-  "Puebla": "Puebla",
-  "Querétaro": "Querétaro",
-  "Queretaro": "Querétaro",
+  Oaxaca: "Oaxaca",
+  Puebla: "Puebla",
+  Querétaro: "Querétaro",
+  Queretaro: "Querétaro",
   "Quintana Roo": "Quintana Roo",
   "San Luis Potosí": "San Luis Potosí",
   "San Luis Potosi": "San Luis Potosí",
-  "Sinaloa": "Sinaloa",
-  "Sonora": "Sonora",
-  "Tabasco": "Tabasco",
-  "Tamaulipas": "Tamaulipas",
-  "Tlaxcala": "Tlaxcala",
+  Sinaloa: "Sinaloa",
+  Sonora: "Sonora",
+  Tabasco: "Tabasco",
+  Tamaulipas: "Tamaulipas",
+  Tlaxcala: "Tlaxcala",
   "Veracruz de Ignacio de la Llave": "Veracruz",
-  "Veracruz": "Veracruz",
-  "Yucatán": "Yucatán",
-  "Yucatan": "Yucatán",
-  "Zacatecas": "Zacatecas",
+  Veracruz: "Veracruz",
+  Yucatán: "Yucatán",
+  Yucatan: "Yucatán",
+  Zacatecas: "Zacatecas",
 };
 
 interface GeoFeature {
@@ -105,22 +103,23 @@ function MexicoMapComponent({
         setLoading(true);
         const response = await fetch(MEXICO_TOPOJSON_URL);
         if (!response.ok) throw new Error("Failed to fetch map data");
-        
+
         const data = await response.json();
-        
+
         // Handle both GeoJSON and TopoJSON formats
         let features: GeoFeature[];
         if (data.type === "Topology") {
           // TopoJSON format
           const objectKey = Object.keys(data.objects)[0];
-          features = topojson.feature(data, data.objects[objectKey]).features as GeoFeature[];
+          features = topojson.feature(data, data.objects[objectKey])
+            .features as GeoFeature[];
         } else if (data.type === "FeatureCollection") {
           // GeoJSON format
           features = data.features as GeoFeature[];
         } else {
           throw new Error("Unknown data format");
         }
-        
+
         setGeoData(features);
         setError(null);
       } catch (err) {
@@ -216,7 +215,9 @@ function MexicoMapComponent({
     return (
       <div className="w-full">
         <div className="text-center mb-6">
-          <h3 className="font-serif text-2xl md:text-3xl text-foreground">{title}</h3>
+          <h3 className="font-serif text-2xl md:text-3xl text-foreground">
+            {title}
+          </h3>
           <p className="text-muted-foreground mt-2">{subtitle}</p>
         </div>
         <div className="bg-card border border-border rounded-lg p-8 flex items-center justify-center min-h-[400px]">
@@ -233,7 +234,9 @@ function MexicoMapComponent({
     return (
       <div className="w-full">
         <div className="text-center mb-6">
-          <h3 className="font-serif text-2xl md:text-3xl text-foreground">{title}</h3>
+          <h3 className="font-serif text-2xl md:text-3xl text-foreground">
+            {title}
+          </h3>
           <p className="text-muted-foreground mt-2">{subtitle}</p>
         </div>
         <div className="bg-card border border-border rounded-lg p-8 flex items-center justify-center min-h-[400px]">
@@ -253,7 +256,9 @@ function MexicoMapComponent({
     >
       {/* Header */}
       <div className="text-center mb-6">
-        <h3 className="font-serif text-2xl md:text-3xl text-foreground">{title}</h3>
+        <h3 className="font-serif text-2xl md:text-3xl text-foreground">
+          {title}
+        </h3>
         <p className="text-muted-foreground mt-2">{subtitle}</p>
       </div>
 
@@ -277,9 +282,10 @@ function MexicoMapComponent({
           <g>
             {geoData.map((feature, index) => {
               const stateName = getStateName(feature);
-              const stateData = getStateData(stateName);
               const isHovered = hoveredState === stateName;
-              const pathD = pathGenerator(feature as d3Geo.GeoPermissibleObjects);
+              const pathD = pathGenerator(
+                feature as d3Geo.GeoPermissibleObjects
+              );
 
               if (!pathD) return null;
 
@@ -343,7 +349,9 @@ function MexicoMapComponent({
               {(() => {
                 const data = getStateData(hoveredState);
                 if (!data)
-                  return <p className="text-foreground font-serif">{hoveredState}</p>;
+                  return (
+                    <p className="text-foreground font-serif">{hoveredState}</p>
+                  );
                 return (
                   <>
                     <p className="font-serif text-lg text-foreground font-semibold">
@@ -351,29 +359,38 @@ function MexicoMapComponent({
                     </p>
                     <div className="mt-2 space-y-1">
                       <p className="text-sm">
-                        <span className="text-muted-foreground">Homicide Rate:</span>{" "}
+                        <span className="text-muted-foreground">
+                          Homicide Rate:
+                        </span>{" "}
                         <span className="text-primary font-mono font-bold">
                           {data.homicideRate}
                         </span>
-                        <span className="text-muted-foreground text-xs"> /100k</span>
+                        <span className="text-muted-foreground text-xs">
+                          {" "}
+                          /100k
+                        </span>
                       </p>
                       <p className="text-sm">
-                        <span className="text-muted-foreground">Total Homicides:</span>{" "}
+                        <span className="text-muted-foreground">
+                          Total Homicides:
+                        </span>{" "}
                         <span className="text-foreground font-mono">
                           {data.totalHomicides.toLocaleString()}
                         </span>
                       </p>
                       <p className="text-sm">
-                        <span className="text-muted-foreground">Violence Level:</span>{" "}
+                        <span className="text-muted-foreground">
+                          Violence Level:
+                        </span>{" "}
                         <span
                           className={`font-semibold ${
                             data.violenceLevel === "extreme"
                               ? "text-red-500"
                               : data.violenceLevel === "high"
-                              ? "text-orange-500"
-                              : data.violenceLevel === "medium"
-                              ? "text-yellow-500"
-                              : "text-green-500"
+                                ? "text-orange-500"
+                                : data.violenceLevel === "medium"
+                                  ? "text-yellow-500"
+                                  : "text-green-500"
                           }`}
                         >
                           {data.violenceLevel.charAt(0).toUpperCase() +
@@ -382,7 +399,9 @@ function MexicoMapComponent({
                       </p>
                       {data.cartelPresence.length > 0 && (
                         <div className="pt-1 border-t border-border mt-2">
-                          <p className="text-xs text-muted-foreground">Cartel Presence:</p>
+                          <p className="text-xs text-muted-foreground">
+                            Cartel Presence:
+                          </p>
                           <p className="text-xs text-foreground">
                             {data.cartelPresence.join(", ")}
                           </p>
@@ -426,7 +445,10 @@ function MexicoMapComponent({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
         <div className="text-center p-4 bg-card border border-border rounded-lg">
           <p className="font-mono text-2xl md:text-3xl text-primary font-bold">
-            {stateHomicideData.filter((s) => s.violenceLevel === "extreme").length}
+            {
+              stateHomicideData.filter((s) => s.violenceLevel === "extreme")
+                .length
+            }
           </p>
           <p className="text-xs text-muted-foreground uppercase mt-1 tracking-wide">
             Extreme Violence
@@ -455,7 +477,11 @@ function MexicoMapComponent({
         </div>
         <div className="text-center p-4 bg-card border border-border rounded-lg">
           <p className="font-mono text-2xl md:text-3xl text-primary font-bold">
-            {stateHomicideData.filter((s) => s.cartelPresence.includes("CJNG")).length}
+            {
+              stateHomicideData.filter((s) =>
+                s.cartelPresence.includes("CJNG")
+              ).length
+            }
           </p>
           <p className="text-xs text-muted-foreground uppercase mt-1 tracking-wide">
             CJNG States

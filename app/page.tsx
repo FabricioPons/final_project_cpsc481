@@ -1,5 +1,7 @@
 "use client";
 
+// El Precio del Poder - Mexico Drug War Scrollytelling Project
+
 import { ScrollProvider } from "@/components/scroll-provider";
 import { HeroSection } from "@/components/sections/hero-section";
 import { ElMenchoSection } from "@/components/sections/el-mencho-section";

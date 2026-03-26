@@ -1,5 +1,6 @@
 "use client";
 
+// War Begins Section - Calderón Era (2006-2012)
 import { useRef } from "react";
 import Image from "next/image";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
