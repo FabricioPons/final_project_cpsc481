@@ -64,7 +64,7 @@ export const presidents: President[] = [
     keyPolicy: "NAFTA Implementation",
     keyEvent: "Drug routes shift as Colombian cartels lose power",
     quote: "Mexico is ready to compete in the global economy.",
-    imageUrl: "/images/presidents/salinas.jpg",
+    imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/salinas-eFYI3LA2wCj2yyg1Ae6KW4zVVd9hWl.jpeg",
   },
   {
     id: "zedillo",
@@ -82,7 +82,7 @@ export const presidents: President[] = [
     keyPolicy: "Peso Crisis Recovery",
     keyEvent: "Mexican cartels consolidate trafficking routes",
     quote: "We will fight corruption at all levels.",
-    imageUrl: "/images/presidents/zedillo.jpg",
+    imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/zedillo-yC3AgSzcKUGzKd2dmJRnZ8mYeL9Lgp.jpg",
   },
   {
     id: "fox",
@@ -100,7 +100,7 @@ export const presidents: President[] = [
     keyPolicy: "Democratic Transition",
     keyEvent: "Cartels expand during political transition",
     quote: "Today Mexico has changed. We are a democracy.",
-    imageUrl: "/images/presidents/fox.jpg",
+    imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/fox-uDVxrzX8mjYNko4FcCxzhnjCWJDHiN.jpg",
   },
   {
     id: "calderon",
@@ -118,7 +118,7 @@ export const presidents: President[] = [
     keyPolicy: "Military War on Drugs",
     keyEvent: "Deployed 6,500 troops to Michoacán (Dec 11, 2006)",
     quote: "We will not rest until we restore peace and security.",
-    imageUrl: "/images/presidents/calderon.jpg",
+    imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/calderon-XK6dlH9nNtvecnUCEDzODys4AZ342a.jpg",
   },
   {
     id: "pena-nieto",
@@ -136,7 +136,7 @@ export const presidents: President[] = [
     keyPolicy: "Kingpin Strategy",
     keyEvent: "El Chapo captured twice (2014, 2016); CJNG rises",
     quote: "Mexico is transforming.",
-    imageUrl: "/images/presidents/pena-nieto.jpg",
+    imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/pena_nieto-tFL4ms67uXgrOXyAmEbOUAZYpnnZvS.jpg",
   },
   {
     id: "amlo",
@@ -154,7 +154,7 @@ export const presidents: President[] = [
     keyPolicy: "Abrazos, No Balazos (Hugs, Not Bullets)",
     keyEvent: "CJNG becomes dominant cartel; El Mencho rises to #1 target",
     quote: "The war is over. We will not confront violence with violence.",
-    imageUrl: "/images/presidents/amlo.jpg",
+    imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/amlo-8OV2P9RattML1jB9arb0ulbo69a8I2.jpg",
   },
   {
     id: "sheinbaum",
@@ -172,7 +172,7 @@ export const presidents: President[] = [
     keyPolicy: "Continuation + Security Focus",
     keyEvent: "El Mencho killed (Feb 22, 2026)",
     quote: "We will build a Mexico with justice and peace.",
-    imageUrl: "/images/presidents/sheinbaum.jpg",
+    imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sheinbaum-DuIclxJE8iU0BWkn1iYfcRYP5HPQKo.jpg",
   },
 ];
 

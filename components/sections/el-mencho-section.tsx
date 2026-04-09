@@ -44,11 +44,11 @@ export function ElMenchoSection() {
           >
             <div className="aspect-[3/4] bg-muted border border-border relative overflow-hidden photo-frame">
               <Image
-                src="/images/el-mencho-silhouette.jpg"
-                alt="El Mencho - Nemesio Oseguera Cervantes"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/el-mencho-3koIiTFsSCWlOkODgWbuoz1DgHUjMR.png"
+                alt="El Mencho - Nemesio Oseguera Cervantes - DEA Wanted Photo"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover w-full h-full"
+                className="object-cover object-top w-full h-full"
                 priority
               />
               {/* Border accent */}
