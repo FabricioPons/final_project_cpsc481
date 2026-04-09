@@ -44,8 +44,8 @@ export function ElMenchoSection() {
           >
             <div className="aspect-[3/4] bg-muted border border-border relative overflow-hidden photo-frame">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/el-mencho-3koIiTFsSCWlOkODgWbuoz1DgHUjMR.png"
-                alt="El Mencho - Nemesio Oseguera Cervantes - DEA Wanted Photo"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/el_mencho_new-9a4NAbPCLOsKRuWAZLN7uELWSZncVN.avif"
+                alt="El Mencho - Nemesio Oseguera Cervantes"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover object-top w-full h-full"
