@@ -57,7 +57,7 @@ export function WarBeginsSection() {
           >
             <div className="relative aspect-video bg-muted border border-border overflow-hidden photo-frame">
               <Image
-                src="/images/military-silhouette.jpg"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/calderon_war-0udAEf3UZs3C0WkStkbX2hCZu30uPg.avif"
                 alt="Mexican military deployment during Calderón's drug war"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
