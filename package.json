@@ -19,7 +19,8 @@
     "react-svg-worldmap": "^2.0.0-alpha.16",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.0"
+    "tailwind-merge": "^2.5.0",
+    "@svg-maps/mexico": "^2.0.0"
   },
   "engines": {
     "node": ">=20.9.0"
