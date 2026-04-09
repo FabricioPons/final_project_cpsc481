@@ -25,11 +25,11 @@ export function TimelineSection() {
             SIX ADMINISTRATIONS
           </p>
           <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-foreground text-balance">
-            The Cost of Each Decision
+            What Each President Left Behind
           </h2>
           <p className="text-xl text-muted-foreground mt-6 max-w-2xl mx-auto leading-relaxed">
-            From 1988 to 2024, six presidents made choices that shaped the trajectory 
-            of violence in Mexico. Each administration left its mark—measured in lives.
+            Between 1988 and 2024, six Mexican presidents made decisions that changed the course 
+            of the country. Each one left behind a different kind of legacy, counted in lives lost.
           </p>
         </motion.div>
       </div>
@@ -55,8 +55,8 @@ export function TimelineSection() {
       {/* Death counter highlight */}
       <div className="py-24 bg-gradient-to-b from-transparent via-primary/5 to-transparent">
         <DeathCounter
-          label="Lives Lost Since 1990"
-          sublabel="Intentional homicides recorded in Mexico"
+          label="People Killed Since 1990"
+          sublabel="Homicides recorded in Mexico"
           size="xl"
           duration={4}
         />

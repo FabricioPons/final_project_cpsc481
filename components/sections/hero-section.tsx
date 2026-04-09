@@ -57,8 +57,8 @@ export function HeroSection() {
           transition={{ duration: 1, delay: 0.7 }}
           className="font-serif text-2xl md:text-3xl lg:text-4xl text-muted-foreground mt-6 leading-relaxed"
         >
-          Mexico&apos;s most wanted drug lord.<br />
-          The end of an era.
+          The most wanted man in Mexico.<br />
+          An era ends.
         </motion.p>
 
         {/* Separator */}
@@ -77,11 +77,11 @@ export function HeroSection() {
           className="mt-12 space-y-6"
         >
           <p className="text-xl md:text-2xl text-foreground font-light leading-relaxed max-w-3xl mx-auto">
-            But his death is not the end of the story.
+            But this isn&apos;t the end.
           </p>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            It is merely the latest chapter in a war that has claimed{" "}
-            <span className="text-primary font-mono font-bold">over 500,000 lives</span>.
+            It&apos;s just one more death in a war that has killed{" "}
+            <span className="text-primary font-mono font-bold">over 500,000 people</span>.
           </p>
         </motion.div>
 

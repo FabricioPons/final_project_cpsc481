@@ -37,7 +37,7 @@ export function ConclusionSection() {
             transition={{ duration: 0.8, delay: 1 }}
             className="text-muted-foreground mt-8 max-w-xl mx-auto"
           >
-            Each number represents a person. A family destroyed. A community terrorized.
+            Every number is a person who was killed. A family torn apart. A neighborhood that will never feel safe again.
           </motion.p>
         </motion.div>
       </div>
@@ -81,8 +81,7 @@ export function ConclusionSection() {
               />
             </div>
             <p className="text-sm text-muted-foreground mt-4 italic">
-              Memorial vigils remember the hundreds of thousands lost to violence.
-              Each flame represents a life, a family, a community shattered.
+              Vigils across Mexico remember those killed. Each candle is someone who won&apos;t come home.
             </p>
           </motion.div>
 
@@ -109,15 +108,15 @@ export function ConclusionSection() {
           className="space-y-8"
         >
           <p className="text-xl text-foreground leading-relaxed">
-            History suggests that El Mencho&apos;s death will not end the violence. 
-            When leaders fall, organizations fracture, and new wars begin.
+            If history is any guide, killing El Mencho won&apos;t stop anything. 
+            When a leader dies, the organization breaks apart and the fighting gets worse.
           </p>
           <p className="text-xl text-foreground leading-relaxed">
-            His sons and lieutenants remain. CJNG&apos;s infrastructure spans continents. 
-            And the demand for drugs—especially fentanyl—shows no sign of slowing.
+            His sons are still out there. So are his lieutenants. CJNG operates in dozens of countries. 
+            Americans keep buying fentanyl.
           </p>
           <p className="text-xl text-muted-foreground leading-relaxed">
-            The question is not whether the violence will end. The question is: 
+            The real question isn&apos;t whether the violence will stop. It&apos;s: 
             what choices will the next generation of leaders make?
           </p>
         </motion.div>
