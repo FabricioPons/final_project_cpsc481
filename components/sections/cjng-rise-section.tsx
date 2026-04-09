@@ -45,8 +45,8 @@ export function CJNGRiseSection() {
           >
             <div className="relative aspect-video bg-muted border border-border overflow-hidden photo-frame">
               <Image
-                src="/images/cartel-infographic.jpg"
-                alt="CJNG cartel network and organizational structure"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cjng-Kk4NbEG4RyKbjnNtj4DZv0vxQ3wpAt.avif"
+                alt="CJNG cartel operations and organizational structure"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover w-full h-full"
