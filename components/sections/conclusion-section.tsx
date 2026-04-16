@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { DeathCounter, InlineCounter } from "@/components/death-counter";
+import { VictimProfile } from "@/components/victim-profile";
 import { statistics } from "@/lib/data";
 import { PresidentComparison } from "@/components/charts/president-comparison";
 
@@ -97,6 +98,32 @@ export function ConclusionSection() {
             </h2>
           </motion.div>
         </div>
+      </div>
+
+      {/* Victim Profile - Make it personal */}
+      <div className="max-w-4xl mx-auto px-6 py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.7 }}
+          className="mb-12"
+        >
+          <p className="font-mono text-primary text-sm tracking-widest mb-4 text-center">
+            BEHIND THE NUMBERS
+          </p>
+          <h3 className="font-serif text-3xl text-center text-foreground mb-12">
+            One Face, Half a Million Stories
+          </h3>
+        </motion.div>
+        
+        <VictimProfile
+          name="Javier Morales"
+          age={28}
+          location="Monterrey, Nuevo León"
+          date="March 2018"
+          story="He was a teacher. He had a wife and two kids. He drove a taxi at night to pay for his daughter's schooling. He was shot three times in the back of his car. They never found out why. They never found who did it."
+          impact="His family never got justice. His children grew up without a father. His death is one number in thousands. But to them, he was everything."
+        />
       </div>
 
       {/* What comes next */}
