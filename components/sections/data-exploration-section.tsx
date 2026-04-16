@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { InteractiveMexicoMap } from "@/components/interactive-mexico-map";
+import { MexicoMap } from "@/components/charts/mexico-map";
 import { WorldComparisonMap } from "@/components/charts/world-map";
 import { AnalyticsDashboard } from "@/components/charts/analytics-dashboard";
 
@@ -39,15 +39,10 @@ export function DataExplorationSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mb-16"
         >
-          <div className="bg-card border border-border p-8 rounded-lg">
-            <h3 className="font-serif text-3xl text-foreground mb-2">
-              State-Level Violence Analysis
-            </h3>
-            <p className="text-muted-foreground mb-8">
-              Click on any state to explore detailed homicide rates, cartel presence, and regional trends (2023-2024 INEGI data)
-            </p>
-            <InteractiveMexicoMap />
-          </div>
+          <MexicoMap 
+            title="State-Level Violence Analysis"
+            subtitle="Hover over any state to explore homicide rates, cartel presence, and regional trends (2023-2024 INEGI data)"
+          />
         </motion.div>
 
         {/* World Comparison Map */}
