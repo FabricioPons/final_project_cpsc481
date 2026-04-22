@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useRef, useMemo, useState, Suspense } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { OrbitControls, Html, useTexture } from "@react-three/drei";
+import { useRef, useMemo, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 
 // Geographic coordinates for key locations
@@ -33,28 +33,19 @@ const LOCATIONS = {
   texas: { lat: 31.9686, lng: -99.9018, name: "Texas", role: "Weapons Source" },
 };
 
-// Supply chain connections with real data
+// Supply chain connections
 const CONNECTIONS = [
-  // Precursor chemicals from China to Mexico
   { from: "china", to: "mexico", type: "chemicals", label: "Fentanyl Precursors", value: "$440 = 750K pills" },
-  
-  // Cocaine from South America
   { from: "colombia", to: "mexico", type: "drugs", label: "Cocaine", value: "90% of US supply" },
   { from: "peru", to: "mexico", type: "drugs", label: "Coca Base", value: "" },
   { from: "bolivia", to: "mexico", type: "drugs", label: "Coca Base", value: "" },
-  
-  // Drugs to consumer markets
   { from: "mexico", to: "usa", type: "drugs", label: "Fentanyl & Meth", value: "73,000 deaths/year" },
   { from: "mexico", to: "canada", type: "drugs", label: "Fentanyl", value: "" },
   { from: "mexico", to: "spain", type: "drugs", label: "Cocaine", value: "" },
   { from: "mexico", to: "australia", type: "drugs", label: "Meth", value: "" },
   { from: "netherlands", to: "uk", type: "drugs", label: "Distribution", value: "" },
-  
-  // Weapons flowing INTO Mexico
   { from: "arizona", to: "mexico", type: "weapons", label: "Firearms", value: "74% of crime guns" },
   { from: "texas", to: "mexico", type: "weapons", label: "Firearms", value: "4,359 seized (2026)" },
-  
-  // Money laundering routes
   { from: "usa", to: "mexico", type: "money", label: "Cash", value: "$1.4B suspicious" },
   { from: "mexico", to: "panama", type: "money", label: "Laundering", value: "" },
   { from: "mexico", to: "cayman", type: "money", label: "Offshore", value: "" },
@@ -62,7 +53,59 @@ const CONNECTIONS = [
   { from: "china", to: "usa", type: "money", label: "Mirror Trades", value: "$312B through US banks" },
 ];
 
-// Convert lat/lng to 3D position on sphere
+// Create procedural Earth texture
+function createEarthTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d')!;
+  
+  // Ocean
+  ctx.fillStyle = '#1a365d';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Land - simplified continents
+  ctx.fillStyle = '#2d5016';
+  
+  // North America
+  ctx.beginPath();
+  ctx.ellipse(200, 250, 120, 150, -0.3, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // South America
+  ctx.beginPath();
+  ctx.ellipse(350, 550, 80, 120, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Europe
+  ctx.beginPath();
+  ctx.ellipse(900, 200, 90, 70, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Africa
+  ctx.beginPath();
+  ctx.ellipse(1000, 450, 110, 140, 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Middle East
+  ctx.beginPath();
+  ctx.ellipse(1100, 350, 60, 80, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Asia
+  ctx.beginPath();
+  ctx.ellipse(1300, 280, 200, 160, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Australia
+  ctx.beginPath();
+  ctx.ellipse(1600, 650, 80, 70, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  return new THREE.CanvasTexture(canvas);
+}
+
+// Convert lat/lng to 3D position
 function latLngToVector3(lat: number, lng: number, radius: number): THREE.Vector3 {
   const phi = (90 - lat) * (Math.PI / 180);
   const theta = (lng + 180) * (Math.PI / 180);
@@ -74,7 +117,7 @@ function latLngToVector3(lat: number, lng: number, radius: number): THREE.Vector
   return new THREE.Vector3(x, y, z);
 }
 
-// Animated arc between two points
+// Connection arc
 function ConnectionArc({ 
   from, 
   to, 
@@ -95,7 +138,6 @@ function ConnectionArc({
     const start = latLngToVector3(from.lat, from.lng, 2);
     const end = latLngToVector3(to.lat, to.lng, 2);
     
-    // Calculate midpoint and lift it above the surface
     const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
     const distance = start.distanceTo(end);
     mid.normalize().multiplyScalar(2 + distance * 0.3);
@@ -105,15 +147,12 @@ function ConnectionArc({
 
   const points = useMemo(() => curve.getPoints(50), [curve]);
   
-  const color = useMemo(() => {
-    switch (type) {
-      case "chemicals": return "#3b82f6"; // blue
-      case "drugs": return "#ef4444"; // red
-      case "weapons": return "#f97316"; // orange
-      case "money": return "#22c55e"; // green
-      default: return "#ffffff";
-    }
-  }, [type]);
+  const color = {
+    chemicals: "#3b82f6",
+    drugs: "#ef4444",
+    weapons: "#f97316",
+    money: "#22c55e",
+  }[type] || "#ffffff";
 
   useFrame((state) => {
     if (particleRef.current) {
@@ -142,7 +181,6 @@ function ConnectionArc({
         />
       </line>
       
-      {/* Animated particle */}
       <mesh ref={particleRef}>
         <sphereGeometry args={[0.04, 8, 8]} />
         <meshBasicMaterial color={color} />
@@ -183,13 +221,11 @@ function LocationMarker({
 
   return (
     <group position={position}>
-      {/* Glow effect */}
       <mesh>
         <sphereGeometry args={[0.12, 16, 16]} />
         <meshBasicMaterial color={color} transparent opacity={0.2} />
       </mesh>
       
-      {/* Main marker */}
       <mesh 
         ref={ref}
         onPointerOver={() => setHovered(true)}
@@ -212,10 +248,10 @@ function LocationMarker({
   );
 }
 
-// Globe with Earth texture showing countries
+// Globe
 function Globe() {
   const ref = useRef<THREE.Mesh>(null);
-  const texture = useTexture("/assets/3d/texture_earth.jpg");
+  const texture = useMemo(() => createEarthTexture(), []);
   
   useFrame(() => {
     if (ref.current) {
@@ -225,7 +261,6 @@ function Globe() {
 
   return (
     <group>
-      {/* Main Earth sphere with texture */}
       <mesh ref={ref}>
         <sphereGeometry args={[2, 64, 64]} />
         <meshStandardMaterial 
@@ -235,54 +270,6 @@ function Globe() {
         />
       </mesh>
       
-      {/* Atmosphere glow */}
-      <mesh>
-        <sphereGeometry args={[2.08, 64, 64]} />
-        <meshBasicMaterial 
-          color="#4a90d9"
-          transparent 
-          opacity={0.08}
-          side={THREE.BackSide}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-// Fallback globe without texture (in case texture fails to load)
-function FallbackGlobe() {
-  const ref = useRef<THREE.Mesh>(null);
-  
-  useFrame(() => {
-    if (ref.current) {
-      ref.current.rotation.y += 0.001;
-    }
-  });
-
-  return (
-    <group>
-      {/* Ocean base */}
-      <mesh ref={ref}>
-        <sphereGeometry args={[2, 64, 64]} />
-        <meshStandardMaterial 
-          color="#1a365d"
-          roughness={0.8}
-          metalness={0.2}
-        />
-      </mesh>
-      
-      {/* Continent outlines using wireframe for visual reference */}
-      <mesh rotation={[0, 0, 0]}>
-        <sphereGeometry args={[2.01, 48, 48]} />
-        <meshBasicMaterial 
-          color="#4a5568" 
-          wireframe 
-          transparent 
-          opacity={0.3}
-        />
-      </mesh>
-      
-      {/* Atmosphere glow */}
       <mesh>
         <sphereGeometry args={[2.08, 64, 64]} />
         <meshBasicMaterial 
@@ -309,11 +296,8 @@ function Scene({ activeFlow, onLocationClick }: { activeFlow: string | null; onL
       <pointLight position={[10, 10, 10]} intensity={1.2} />
       <pointLight position={[-10, -10, -10]} intensity={0.4} />
       
-      <Suspense fallback={<FallbackGlobe />}>
-        <Globe />
-      </Suspense>
+      <Globe />
       
-      {/* Connection arcs */}
       {filteredConnections.map((conn, i) => {
         const fromLoc = LOCATIONS[conn.from as keyof typeof LOCATIONS];
         const toLoc = LOCATIONS[conn.to as keyof typeof LOCATIONS];
@@ -331,7 +315,6 @@ function Scene({ activeFlow, onLocationClick }: { activeFlow: string | null; onL
         );
       })}
       
-      {/* Location markers */}
       {Object.entries(LOCATIONS).map(([key, loc]) => (
         <LocationMarker
           key={key}
@@ -355,7 +338,6 @@ function Scene({ activeFlow, onLocationClick }: { activeFlow: string | null; onL
   );
 }
 
-// Flow type selector
 function FlowSelector({ 
   activeFlow, 
   setActiveFlow 
@@ -391,7 +373,6 @@ function FlowSelector({
   );
 }
 
-// Stats cards
 function StatsGrid() {
   const stats = [
     { label: "US Overdose Deaths (2023)", value: "73,000+", subtext: "69% from synthetic opioids", color: "text-red-500" },
@@ -419,18 +400,15 @@ export function GlobalSupplyChainGlobe() {
 
   return (
     <div className="w-full">
-      {/* Globe container */}
       <div className="relative w-full h-[500px] md:h-[600px] rounded-xl overflow-hidden bg-[#0a0a1a] border border-border">
         <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
           <Scene activeFlow={activeFlow} onLocationClick={setSelectedLocation} />
         </Canvas>
         
-        {/* Flow selector overlay */}
         <div className="absolute top-4 left-4 right-4">
           <FlowSelector activeFlow={activeFlow} setActiveFlow={setActiveFlow} />
         </div>
         
-        {/* Legend */}
         <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm rounded-lg p-3 border border-border">
           <p className="text-xs font-medium text-foreground mb-2">Supply Chain Legend</p>
           <div className="space-y-1.5 text-xs">
@@ -453,13 +431,11 @@ export function GlobalSupplyChainGlobe() {
           </div>
         </div>
         
-        {/* Instructions */}
         <div className="absolute bottom-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-border">
-          <p className="text-xs text-muted-foreground">Drag to rotate | Scroll to zoom | Click markers for info</p>
+          <p className="text-xs text-muted-foreground">Drag to rotate | Scroll to zoom | Click markers</p>
         </div>
       </div>
 
-      {/* Stats below globe */}
       <div className="mt-8">
         <StatsGrid />
       </div>
