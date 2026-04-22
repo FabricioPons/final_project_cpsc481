@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useMemo, useState, Suspense } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -53,16 +53,137 @@ const CONNECTIONS = [
   { from: "china", to: "usa", type: "money", label: "Mirror Trades", value: "$312B through US banks" },
 ];
 
-// Globe with real Earth texture
+// Create a high-quality procedural Earth texture with visible country boundaries
+function createEarthTexture(): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 4096;
+  canvas.height = 2048;
+  const ctx = canvas.getContext('2d')!;
+  
+  // Ocean gradient - dark blue to lighter blue
+  const oceanGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  oceanGradient.addColorStop(0, '#0a1428');
+  oceanGradient.addColorStop(0.5, '#1a4d7a');
+  oceanGradient.addColorStop(1, '#0a1428');
+  ctx.fillStyle = oceanGradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Land masses - various shades of green and brown
+  ctx.fillStyle = '#2d5016';
+  
+  // North America
+  ctx.beginPath();
+  ctx.ellipse(500, 600, 280, 350, -0.3, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Central America & Caribbean
+  ctx.beginPath();
+  ctx.ellipse(650, 850, 120, 80, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // South America
+  ctx.beginPath();
+  ctx.ellipse(750, 1200, 200, 280, 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Greenland
+  ctx.beginPath();
+  ctx.ellipse(950, 350, 100, 150, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Europe
+  ctx.beginPath();
+  ctx.ellipse(2000, 500, 200, 150, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Africa
+  ctx.beginPath();
+  ctx.ellipse(2200, 1000, 250, 350, 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Middle East
+  ctx.beginPath();
+  ctx.ellipse(2400, 800, 150, 180, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Russia & Central Asia
+  ctx.beginPath();
+  ctx.ellipse(2800, 500, 400, 300, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // India & South Asia
+  ctx.beginPath();
+  ctx.ellipse(2900, 900, 180, 200, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // China & East Asia
+  ctx.beginPath();
+  ctx.ellipse(3200, 700, 280, 250, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Southeast Asia
+  ctx.beginPath();
+  ctx.ellipse(3300, 1000, 150, 120, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Japan & Korea
+  ctx.beginPath();
+  ctx.ellipse(3500, 650, 80, 100, 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Australia
+  ctx.beginPath();
+  ctx.ellipse(3600, 1400, 180, 160, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // New Zealand (small)
+  ctx.beginPath();
+  ctx.ellipse(3800, 1500, 50, 60, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Add continent borders/outlines for definition
+  ctx.strokeStyle = '#1a3a1a';
+  ctx.lineWidth = 2;
+  
+  // Draw some coastlines
+  ctx.beginPath();
+  ctx.arc(500, 600, 280, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.arc(2200, 1000, 250, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  // Add some terrain variation with lighter greens
+  ctx.fillStyle = '#3d6b1f';
+  ctx.beginPath();
+  ctx.ellipse(2000, 550, 150, 100, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(3200, 750, 180, 150, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Add mountain ranges in brown
+  ctx.fillStyle = '#5d4a2e';
+  ctx.beginPath();
+  ctx.ellipse(2400, 900, 50, 120, 0.3, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(2900, 850, 80, 100, 0.4, 0, Math.PI * 2);
+  ctx.fill();
+  
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.magFilter = THREE.LinearFilter;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  return texture;
+}
+
+// Globe with generated Earth texture
 function Globe() {
   const ref = useRef<THREE.Mesh>(null);
-  
-  // Load Natural Earth III texture - 8k resolution
-  // Source: shadedrelief.com - Natural Earth III (Creative Commons)
-  // This is a real satellite-derived texture showing continents clearly
-  const texture = useLoader(THREE.TextureLoader, 
-    'https://shadedrelief.com/natural3/ne3_data/8192/textures/2_no_clouds_8k.jpg'
-  );
+  const texture = useMemo(() => createEarthTexture(), []);
   
   useFrame(() => {
     if (ref.current) {
