@@ -210,20 +210,19 @@ export function GlobalSupplyChainGlobe() {
         
         {/* Flow selector overlay */}
         <div className="absolute top-4 left-4 right-4 z-10">
-          <div className="flex flex-col gap-3">
-            <FlowSelector activeFlow={activeFlow} setActiveFlow={setActiveFlow} />
-            <button
-              onClick={() => setIsRotating(!isRotating)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all w-fit ${
-                isRotating
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              {isRotating ? "Stop Rotation" : "Start Rotation"}
-            </button>
-          </div>
+          <FlowSelector activeFlow={activeFlow} setActiveFlow={setActiveFlow} />
         </div>
+        
+        {/* Rotation toggle - subtle bottom right */}
+        <button
+          onClick={() => setIsRotating(!isRotating)}
+          title={isRotating ? "Stop rotation" : "Start rotation"}
+          className="absolute bottom-4 right-4 z-10 p-2 rounded-lg transition-all opacity-40 hover:opacity-70 bg-muted/30 hover:bg-muted/60 border border-border/50"
+        >
+          <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
         
         {/* Legend */}
         <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm rounded-lg p-3 border border-border z-10">
@@ -249,7 +248,7 @@ export function GlobalSupplyChainGlobe() {
         </div>
         
         {/* Instructions */}
-        <div className="absolute bottom-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-border z-10">
+        <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-border z-10">
           <p className="text-xs text-muted-foreground">Drag to rotate | Scroll to zoom | Hover for info</p>
         </div>
       </div>
