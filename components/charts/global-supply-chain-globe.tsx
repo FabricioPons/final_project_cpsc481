@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useMemo, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Text } from "@react-three/drei";
+import { useRef, useMemo, useState, Suspense } from "react";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { OrbitControls, Html, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 
 // Geographic coordinates for key locations
@@ -137,14 +137,14 @@ function ConnectionArc({
         <lineBasicMaterial 
           color={color} 
           transparent 
-          opacity={isHighlighted ? 0.9 : 0.4} 
+          opacity={isHighlighted ? 0.9 : 0.5} 
           linewidth={2}
         />
       </line>
       
       {/* Animated particle */}
       <mesh ref={particleRef}>
-        <sphereGeometry args={[0.03, 8, 8]} />
+        <sphereGeometry args={[0.04, 8, 8]} />
         <meshBasicMaterial color={color} />
       </mesh>
     </group>
@@ -170,7 +170,7 @@ function LocationMarker({
   
   useFrame(() => {
     if (ref.current) {
-      ref.current.scale.setScalar(hovered || isHighlighted ? 1.5 : 1);
+      ref.current.scale.setScalar(hovered || isHighlighted ? 1.8 : 1);
     }
   });
 
@@ -183,13 +183,20 @@ function LocationMarker({
 
   return (
     <group position={position}>
+      {/* Glow effect */}
+      <mesh>
+        <sphereGeometry args={[0.12, 16, 16]} />
+        <meshBasicMaterial color={color} transparent opacity={0.2} />
+      </mesh>
+      
+      {/* Main marker */}
       <mesh 
         ref={ref}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
         onClick={onClick}
       >
-        <sphereGeometry args={[0.05, 16, 16]} />
+        <sphereGeometry args={[0.06, 16, 16]} />
         <meshBasicMaterial color={color} />
       </mesh>
       
@@ -205,8 +212,45 @@ function LocationMarker({
   );
 }
 
-// Globe with Earth texture
+// Globe with Earth texture showing countries
 function Globe() {
+  const ref = useRef<THREE.Mesh>(null);
+  const texture = useTexture("/assets/3d/texture_earth.jpg");
+  
+  useFrame(() => {
+    if (ref.current) {
+      ref.current.rotation.y += 0.001;
+    }
+  });
+
+  return (
+    <group>
+      {/* Main Earth sphere with texture */}
+      <mesh ref={ref}>
+        <sphereGeometry args={[2, 64, 64]} />
+        <meshStandardMaterial 
+          map={texture}
+          roughness={0.6}
+          metalness={0.1}
+        />
+      </mesh>
+      
+      {/* Atmosphere glow */}
+      <mesh>
+        <sphereGeometry args={[2.08, 64, 64]} />
+        <meshBasicMaterial 
+          color="#4a90d9"
+          transparent 
+          opacity={0.08}
+          side={THREE.BackSide}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+// Fallback globe without texture (in case texture fails to load)
+function FallbackGlobe() {
   const ref = useRef<THREE.Mesh>(null);
   
   useFrame(() => {
@@ -216,24 +260,39 @@ function Globe() {
   });
 
   return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[2, 64, 64]} />
-      <meshStandardMaterial 
-        color="#1a1a2e"
-        roughness={0.8}
-        metalness={0.2}
-      />
-      {/* Grid lines */}
-      <mesh>
-        <sphereGeometry args={[2.01, 32, 32]} />
-        <meshBasicMaterial 
-          color="#374151" 
-          wireframe 
-          transparent 
-          opacity={0.15}
+    <group>
+      {/* Ocean base */}
+      <mesh ref={ref}>
+        <sphereGeometry args={[2, 64, 64]} />
+        <meshStandardMaterial 
+          color="#1a365d"
+          roughness={0.8}
+          metalness={0.2}
         />
       </mesh>
-    </mesh>
+      
+      {/* Continent outlines using wireframe for visual reference */}
+      <mesh rotation={[0, 0, 0]}>
+        <sphereGeometry args={[2.01, 48, 48]} />
+        <meshBasicMaterial 
+          color="#4a5568" 
+          wireframe 
+          transparent 
+          opacity={0.3}
+        />
+      </mesh>
+      
+      {/* Atmosphere glow */}
+      <mesh>
+        <sphereGeometry args={[2.08, 64, 64]} />
+        <meshBasicMaterial 
+          color="#4a90d9"
+          transparent 
+          opacity={0.08}
+          side={THREE.BackSide}
+        />
+      </mesh>
+    </group>
   );
 }
 
@@ -246,10 +305,13 @@ function Scene({ activeFlow, onLocationClick }: { activeFlow: string | null; onL
 
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
+      <ambientLight intensity={0.8} />
+      <pointLight position={[10, 10, 10]} intensity={1.2} />
+      <pointLight position={[-10, -10, -10]} intensity={0.4} />
       
-      <Globe />
+      <Suspense fallback={<FallbackGlobe />}>
+        <Globe />
+      </Suspense>
       
       {/* Connection arcs */}
       {filteredConnections.map((conn, i) => {
@@ -273,7 +335,7 @@ function Scene({ activeFlow, onLocationClick }: { activeFlow: string | null; onL
       {Object.entries(LOCATIONS).map(([key, loc]) => (
         <LocationMarker
           key={key}
-          position={latLngToVector3(loc.lat, loc.lng, 2)}
+          position={latLngToVector3(loc.lat, loc.lng, 2.05)}
           name={loc.name}
           role={loc.role}
           isHighlighted={false}
@@ -358,7 +420,7 @@ export function GlobalSupplyChainGlobe() {
   return (
     <div className="w-full">
       {/* Globe container */}
-      <div className="relative w-full h-[500px] md:h-[600px] rounded-xl overflow-hidden bg-background border border-border">
+      <div className="relative w-full h-[500px] md:h-[600px] rounded-xl overflow-hidden bg-[#0a0a1a] border border-border">
         <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
           <Scene activeFlow={activeFlow} onLocationClick={setSelectedLocation} />
         </Canvas>
@@ -369,31 +431,31 @@ export function GlobalSupplyChainGlobe() {
         </div>
         
         {/* Legend */}
-        <div className="absolute bottom-4 left-4 bg-background/80 backdrop-blur-sm rounded-lg p-3 border border-border">
+        <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm rounded-lg p-3 border border-border">
           <p className="text-xs font-medium text-foreground mb-2">Supply Chain Legend</p>
-          <div className="space-y-1 text-xs">
+          <div className="space-y-1.5 text-xs">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-0.5 bg-blue-500" />
+              <span className="w-4 h-1 bg-blue-500 rounded-full" />
               <span className="text-muted-foreground">Precursor Chemicals (China)</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-3 h-0.5 bg-red-500" />
+              <span className="w-4 h-1 bg-red-500 rounded-full" />
               <span className="text-muted-foreground">Drug Trafficking Routes</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-3 h-0.5 bg-orange-500" />
+              <span className="w-4 h-1 bg-orange-500 rounded-full" />
               <span className="text-muted-foreground">Arms Flowing to Mexico</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-3 h-0.5 bg-green-500" />
+              <span className="w-4 h-1 bg-green-500 rounded-full" />
               <span className="text-muted-foreground">Money Laundering Routes</span>
             </div>
           </div>
         </div>
         
         {/* Instructions */}
-        <div className="absolute bottom-4 right-4 bg-background/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-border">
-          <p className="text-xs text-muted-foreground">Drag to rotate | Scroll to zoom</p>
+        <div className="absolute bottom-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-border">
+          <p className="text-xs text-muted-foreground">Drag to rotate | Scroll to zoom | Click markers for info</p>
         </div>
       </div>
 
