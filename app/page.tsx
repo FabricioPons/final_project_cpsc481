@@ -10,6 +10,7 @@ import { ElMenchoSection } from "@/components/sections/el-mencho-section";
 import { TimelineSection } from "@/components/sections/timeline-section";
 import { MapScrollytellingSection } from "@/components/sections/map-scrollytelling-section";
 import { CJNGRiseSection } from "@/components/sections/cjng-rise-section";
+import { GlobalImpactSection } from "@/components/sections/global-impact-section";
 import { ConclusionSection } from "@/components/sections/conclusion-section";
 
 const SECTIONS = [
@@ -18,6 +19,7 @@ const SECTIONS = [
   { id: "timeline", title: "Six Presidents" },
   { id: "map-story", title: "The War" },
   { id: "cjng", title: "CJNG Rises" },
+  { id: "global", title: "Global Machine" },
   { id: "conclusion", title: "The Question" },
 ];
 
@@ -50,7 +52,7 @@ export default function Home() {
   };
 
   return (
-    <ScrollProvider totalSections={6}>
+    <ScrollProvider totalSections={7}>
       <SectionNav
         sections={SECTIONS}
         activeSection={activeSection}
@@ -82,7 +84,12 @@ export default function Home() {
           <CJNGRiseSection />
         </div>
 
-        {/* Section 6: The Conclusion - Where We Are Now */}
+        {/* Section 6: Global Impact - The Multinational Machine */}
+        <div id="global">
+          <GlobalImpactSection />
+        </div>
+
+        {/* Section 7: The Conclusion - Where We Are Now */}
         <div id="conclusion">
           <ConclusionSection />
         </div>
