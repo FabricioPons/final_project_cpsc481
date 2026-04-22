@@ -113,6 +113,7 @@ function StatsGrid() {
 export function GlobalSupplyChainGlobe() {
   const [activeFlow, setActiveFlow] = useState<string | null>(null);
   const [globeReady, setGlobeReady] = useState(false);
+  const [isRotating, setIsRotating] = useState(true);
   const globeRef = useRef<any>(null);
 
   // Convert connections to arcs data
@@ -155,11 +156,11 @@ export function GlobalSupplyChainGlobe() {
   // Auto-rotate and set initial view
   useEffect(() => {
     if (globeRef.current && globeReady) {
-      globeRef.current.controls().autoRotate = true;
+      globeRef.current.controls().autoRotate = isRotating;
       globeRef.current.controls().autoRotateSpeed = 0.5;
       globeRef.current.pointOfView({ lat: 20, lng: -40, altitude: 2.5 }, 1000);
     }
-  }, [globeReady]);
+  }, [globeReady, isRotating]);
 
   return (
     <div className="w-full">
@@ -209,7 +210,19 @@ export function GlobalSupplyChainGlobe() {
         
         {/* Flow selector overlay */}
         <div className="absolute top-4 left-4 right-4 z-10">
-          <FlowSelector activeFlow={activeFlow} setActiveFlow={setActiveFlow} />
+          <div className="flex flex-col gap-3">
+            <FlowSelector activeFlow={activeFlow} setActiveFlow={setActiveFlow} />
+            <button
+              onClick={() => setIsRotating(!isRotating)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all w-fit ${
+                isRotating
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              {isRotating ? "Stop Rotation" : "Start Rotation"}
+            </button>
+          </div>
         </div>
         
         {/* Legend */}
