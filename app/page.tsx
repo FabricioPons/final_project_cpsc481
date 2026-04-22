@@ -8,18 +8,16 @@ import { SectionNav } from "@/components/section-nav";
 import { HeroSection } from "@/components/sections/hero-section";
 import { ElMenchoSection } from "@/components/sections/el-mencho-section";
 import { TimelineSection } from "@/components/sections/timeline-section";
-import { WarBeginsSection } from "@/components/sections/war-begins-section";
+import { MapScrollytellingSection } from "@/components/sections/map-scrollytelling-section";
 import { CJNGRiseSection } from "@/components/sections/cjng-rise-section";
-import { DataExplorationSection } from "@/components/sections/data-exploration-section";
 import { ConclusionSection } from "@/components/sections/conclusion-section";
 
 const SECTIONS = [
   { id: "hero", title: "The Death" },
   { id: "mencho", title: "El Mencho" },
   { id: "timeline", title: "Six Presidents" },
-  { id: "war", title: "War Begins" },
+  { id: "map-story", title: "The War" },
   { id: "cjng", title: "CJNG Rises" },
-  { id: "data", title: "The Numbers" },
   { id: "conclusion", title: "The Question" },
 ];
 
@@ -52,7 +50,7 @@ export default function Home() {
   };
 
   return (
-    <ScrollProvider totalSections={7}>
+    <ScrollProvider totalSections={6}>
       <SectionNav
         sections={SECTIONS}
         activeSection={activeSection}
@@ -74,19 +72,14 @@ export default function Home() {
           <TimelineSection />
         </div>
 
-        {/* Section 3: When the War Began - Calderón */}
-        <div id="war">
-          <WarBeginsSection />
+        {/* Section 3-4: Map Scrollytelling - War Begins through Data Analysis */}
+        <div id="map-story">
+          <MapScrollytellingSection />
         </div>
 
-        {/* Section 4: The Rise of CJNG */}
+        {/* Section 5: The Rise of CJNG */}
         <div id="cjng">
           <CJNGRiseSection />
-        </div>
-
-        {/* Section 5: Interactive Data Exploration */}
-        <div id="data">
-          <DataExplorationSection />
         </div>
 
         {/* Section 6: The Conclusion - Where We Are Now */}
