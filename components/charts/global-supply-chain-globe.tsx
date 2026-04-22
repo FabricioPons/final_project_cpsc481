@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useMemo, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useRef, useMemo, useState, Suspense } from "react";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -53,59 +53,83 @@ const CONNECTIONS = [
   { from: "china", to: "usa", type: "money", label: "Mirror Trades", value: "$312B through US banks" },
 ];
 
-// Create procedural Earth texture
-function createEarthTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 2048;
-  canvas.height = 1024;
-  const ctx = canvas.getContext('2d')!;
+// Globe with real Earth texture
+function Globe() {
+  const ref = useRef<THREE.Mesh>(null);
   
-  // Ocean
-  ctx.fillStyle = '#1a365d';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Load Natural Earth III texture - 8k resolution
+  // Source: shadedrelief.com - Natural Earth III (Creative Commons)
+  // This is a real satellite-derived texture showing continents clearly
+  const texture = useLoader(THREE.TextureLoader, 
+    'https://shadedrelief.com/natural3/ne3_data/8192/textures/2_no_clouds_8k.jpg'
+  );
   
-  // Land - simplified continents
-  ctx.fillStyle = '#2d5016';
-  
-  // North America
-  ctx.beginPath();
-  ctx.ellipse(200, 250, 120, 150, -0.3, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // South America
-  ctx.beginPath();
-  ctx.ellipse(350, 550, 80, 120, 0.2, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Europe
-  ctx.beginPath();
-  ctx.ellipse(900, 200, 90, 70, 0, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Africa
-  ctx.beginPath();
-  ctx.ellipse(1000, 450, 110, 140, 0.1, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Middle East
-  ctx.beginPath();
-  ctx.ellipse(1100, 350, 60, 80, 0, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Asia
-  ctx.beginPath();
-  ctx.ellipse(1300, 280, 200, 160, 0, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Australia
-  ctx.beginPath();
-  ctx.ellipse(1600, 650, 80, 70, 0, 0, Math.PI * 2);
-  ctx.fill();
-  
-  return new THREE.CanvasTexture(canvas);
+  useFrame(() => {
+    if (ref.current) {
+      ref.current.rotation.y += 0.001;
+    }
+  });
+
+  return (
+    <group>
+      <mesh ref={ref}>
+        <sphereGeometry args={[2, 64, 64]} />
+        <meshStandardMaterial 
+          map={texture}
+          roughness={0.6}
+          metalness={0.1}
+        />
+      </mesh>
+      
+      {/* Atmosphere glow */}
+      <mesh>
+        <sphereGeometry args={[2.08, 64, 64]} />
+        <meshBasicMaterial 
+          color="#4a90d9"
+          transparent 
+          opacity={0.08}
+          side={THREE.BackSide}
+        />
+      </mesh>
+    </group>
+  );
 }
 
-// Convert lat/lng to 3D position
+// Fallback globe if texture fails to load
+function FallbackGlobe() {
+  const ref = useRef<THREE.Mesh>(null);
+  
+  useFrame(() => {
+    if (ref.current) {
+      ref.current.rotation.y += 0.001;
+    }
+  });
+
+  return (
+    <group>
+      <mesh ref={ref}>
+        <sphereGeometry args={[2, 64, 64]} />
+        <meshStandardMaterial 
+          color="#1a3a52"
+          roughness={0.8}
+          metalness={0.1}
+        />
+      </mesh>
+      
+      <mesh>
+        <sphereGeometry args={[2.08, 64, 64]} />
+        <meshBasicMaterial 
+          color="#4a90d9"
+          transparent 
+          opacity={0.08}
+          side={THREE.BackSide}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+// Convert lat/lng to 3D position on sphere
 function latLngToVector3(lat: number, lng: number, radius: number): THREE.Vector3 {
   const phi = (90 - lat) * (Math.PI / 180);
   const theta = (lng + 180) * (Math.PI / 180);
@@ -117,7 +141,7 @@ function latLngToVector3(lat: number, lng: number, radius: number): THREE.Vector
   return new THREE.Vector3(x, y, z);
 }
 
-// Connection arc
+// Animated arc between two points
 function ConnectionArc({ 
   from, 
   to, 
@@ -189,7 +213,7 @@ function ConnectionArc({
   );
 }
 
-// Location marker
+// Location marker with tooltip
 function LocationMarker({ 
   position, 
   name, 
@@ -248,41 +272,6 @@ function LocationMarker({
   );
 }
 
-// Globe
-function Globe() {
-  const ref = useRef<THREE.Mesh>(null);
-  const texture = useMemo(() => createEarthTexture(), []);
-  
-  useFrame(() => {
-    if (ref.current) {
-      ref.current.rotation.y += 0.001;
-    }
-  });
-
-  return (
-    <group>
-      <mesh ref={ref}>
-        <sphereGeometry args={[2, 64, 64]} />
-        <meshStandardMaterial 
-          map={texture}
-          roughness={0.6}
-          metalness={0.1}
-        />
-      </mesh>
-      
-      <mesh>
-        <sphereGeometry args={[2.08, 64, 64]} />
-        <meshBasicMaterial 
-          color="#4a90d9"
-          transparent 
-          opacity={0.08}
-          side={THREE.BackSide}
-        />
-      </mesh>
-    </group>
-  );
-}
-
 // Main scene
 function Scene({ activeFlow, onLocationClick }: { activeFlow: string | null; onLocationClick: (name: string) => void }) {
   const filteredConnections = useMemo(() => {
@@ -296,7 +285,9 @@ function Scene({ activeFlow, onLocationClick }: { activeFlow: string | null; onL
       <pointLight position={[10, 10, 10]} intensity={1.2} />
       <pointLight position={[-10, -10, -10]} intensity={0.4} />
       
-      <Globe />
+      <Suspense fallback={<FallbackGlobe />}>
+        <Globe />
+      </Suspense>
       
       {filteredConnections.map((conn, i) => {
         const fromLoc = LOCATIONS[conn.from as keyof typeof LOCATIONS];
