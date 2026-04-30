@@ -57,7 +57,7 @@ export function WarBeginsSection() {
           >
             <div className="relative aspect-video bg-muted border border-border overflow-hidden photo-frame">
               <Image
-                src="/images/military-silhouette.jpg"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/calderon_war-0udAEf3UZs3C0WkStkbX2hCZu30uPg.avif"
                 alt="Mexican military deployment during Calderón's drug war"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -79,17 +79,15 @@ export function WarBeginsSection() {
             className="space-y-6"
           >
             <p className="text-lg text-foreground leading-relaxed">
-              Calderón&apos;s strategy was called the <span className="text-primary font-semibold">
-              &ldquo;Kingpin Strategy&rdquo;</span>—target cartel leaders, fragment the 
-              organizations, and the violence would end.
+              The plan was simple: <span className="text-primary font-semibold">kill or capture the cartel leaders</span>, 
+              break up the organizations, and watch the violence end.
             </p>
             <p className="text-lg text-foreground leading-relaxed">
-              It did the opposite.
+              It backfired spectacularly.
             </p>
             <p className="text-lg text-foreground leading-relaxed">
-              By decapitating cartels, the government created power vacuums. 
-              Organizations splintered. New groups formed. And they fought each 
-              other—and civilians—for control.
+              Cutting off the heads created power vacuums. Cartels broke into smaller, more violent factions. 
+              They fought each other for territory. Civilians got caught in the crossfire.
             </p>
 
             <div className="bg-card border border-border p-6 mt-8">

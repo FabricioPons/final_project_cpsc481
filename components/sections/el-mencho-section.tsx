@@ -44,11 +44,11 @@ export function ElMenchoSection() {
           >
             <div className="aspect-[3/4] bg-muted border border-border relative overflow-hidden photo-frame">
               <Image
-                src="/images/el-mencho-silhouette.jpg"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/el_mencho_new-9a4NAbPCLOsKRuWAZLN7uELWSZncVN.avif"
                 alt="El Mencho - Nemesio Oseguera Cervantes"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover w-full h-full"
+                className="object-cover object-top w-full h-full"
                 priority
               />
               {/* Border accent */}
@@ -70,20 +70,19 @@ export function ElMenchoSection() {
             className="space-y-6"
           >
             <p className="text-lg text-foreground leading-relaxed">
-              He built the <span className="text-primary font-semibold">Jalisco New Generation Cartel (CJNG)</span> into 
+              He turned the <span className="text-primary font-semibold">Jalisco New Generation Cartel</span> into 
               the most powerful criminal organization in the Western Hemisphere.
             </p>
             <p className="text-lg text-foreground leading-relaxed">
-              Under his leadership, CJNG expanded to <span className="text-primary font-mono">35 Mexican states</span> and{" "}
-              <span className="text-primary font-mono">50+ countries</span> worldwide.
+              CJNG operates in <span className="text-primary font-mono">35 of 32 Mexican states</span> and{" "}
+              <span className="text-primary font-mono">over 50 countries</span> around the world.
             </p>
             <p className="text-lg text-foreground leading-relaxed">
-              His cartel was responsible for thousands of deaths, mass disappearances, 
-              and the flooding of fentanyl into the United States.
+              The cartel killed thousands, disappeared more, and flooded American cities with fentanyl.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed italic">
-              But El Mencho was not the cause of Mexico&apos;s violence. He was a symptom—
-              the inevitable product of decades of failed policy.
+              But El Mencho wasn&apos;t the cause of Mexico&apos;s violence. He was what happened when 
+              decades of bad decisions finally caught up.
             </p>
           </motion.div>
         </div>

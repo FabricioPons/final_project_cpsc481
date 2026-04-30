@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { DeathCounter, InlineCounter } from "@/components/death-counter";
+import { VictimProfile } from "@/components/victim-profile";
 import { statistics } from "@/lib/data";
 import { PresidentComparison } from "@/components/charts/president-comparison";
 
@@ -37,7 +38,7 @@ export function ConclusionSection() {
             transition={{ duration: 0.8, delay: 1 }}
             className="text-muted-foreground mt-8 max-w-xl mx-auto"
           >
-            Each number represents a person. A family destroyed. A community terrorized.
+            Every number is a person who was killed. A family torn apart. A neighborhood that will never feel safe again.
           </motion.p>
         </motion.div>
       </div>
@@ -81,8 +82,7 @@ export function ConclusionSection() {
               />
             </div>
             <p className="text-sm text-muted-foreground mt-4 italic">
-              Memorial vigils remember the hundreds of thousands lost to violence.
-              Each flame represents a life, a family, a community shattered.
+              Vigils across Mexico remember those killed. Each candle is someone who won&apos;t come home.
             </p>
           </motion.div>
 
@@ -100,6 +100,32 @@ export function ConclusionSection() {
         </div>
       </div>
 
+      {/* Victim Profile - Make it personal */}
+      <div className="max-w-4xl mx-auto px-6 py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.7 }}
+          className="mb-12"
+        >
+          <p className="font-mono text-primary text-sm tracking-widest mb-4 text-center">
+            BEHIND THE NUMBERS
+          </p>
+          <h3 className="font-serif text-3xl text-center text-foreground mb-12">
+            One Face, Half a Million Stories
+          </h3>
+        </motion.div>
+        
+        <VictimProfile
+          name="Javier Morales"
+          age={28}
+          location="Monterrey, Nuevo León"
+          date="March 2018"
+          story="He was a teacher. He had a wife and two kids. He drove a taxi at night to pay for his daughter's schooling. He was shot three times in the back of his car. They never found out why. They never found who did it."
+          impact="His family never got justice. His children grew up without a father. His death is one number in thousands. But to them, he was everything."
+        />
+      </div>
+
       {/* What comes next */}
       <div className="max-w-4xl mx-auto px-6 py-16">
         <motion.div
@@ -109,15 +135,15 @@ export function ConclusionSection() {
           className="space-y-8"
         >
           <p className="text-xl text-foreground leading-relaxed">
-            History suggests that El Mencho&apos;s death will not end the violence. 
-            When leaders fall, organizations fracture, and new wars begin.
+            If history is any guide, killing El Mencho won&apos;t stop anything. 
+            When a leader dies, the organization breaks apart and the fighting gets worse.
           </p>
           <p className="text-xl text-foreground leading-relaxed">
-            His sons and lieutenants remain. CJNG&apos;s infrastructure spans continents. 
-            And the demand for drugs—especially fentanyl—shows no sign of slowing.
+            His sons are still out there. So are his lieutenants. CJNG operates in dozens of countries. 
+            Americans keep buying fentanyl.
           </p>
           <p className="text-xl text-muted-foreground leading-relaxed">
-            The question is not whether the violence will end. The question is: 
+            The real question isn&apos;t whether the violence will stop. It&apos;s: 
             what choices will the next generation of leaders make?
           </p>
         </motion.div>
