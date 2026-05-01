@@ -4,6 +4,7 @@ import { useRef } from "react";
 import dynamic from "next/dynamic";
 import { motion, useInView } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import type { CountryContext, Data } from "react-svg-worldmap";
 
 // Dynamically import WorldMap to avoid SSR issues
 const WorldMap = dynamic(
@@ -12,7 +13,7 @@ const WorldMap = dynamic(
 );
 
 // World homicide rates per 100,000 (2023 data from UNODC)
-const worldHomicideData = [
+const worldHomicideData: Data = [
   { country: "mx", value: 28.0 }, // Mexico
   { country: "br", value: 22.5 }, // Brazil
   { country: "co", value: 12.5 }, // Colombia
@@ -102,8 +103,8 @@ export function WorldComparisonMap({
                   data={worldHomicideData}
                   backgroundColor="transparent"
                   borderColor="#333"
-                  styleFunction={(context: { countryValue?: number; countryCode?: string; minValue?: number; maxValue?: number; color?: string }) => {
-                    const value = context.countryValue;
+                  styleFunction={(context: CountryContext<string | number>) => {
+                    const value = typeof context.countryValue === 'number' ? context.countryValue : undefined;
                     if (!value) return { fill: "#1a1a1a", stroke: "#333", strokeWidth: 0.5 };
                     
                     // Color scale based on violence level

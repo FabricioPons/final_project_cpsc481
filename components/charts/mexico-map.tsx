@@ -148,7 +148,7 @@ export function MexicoMap({
                 <rect x="-50" y="-50" width="1200" height="900" fill="url(#oceanGrad)" />
 
                 {/* Mexico States from @svg-maps/mexico */}
-                {Mexico.locations.map((location, index) => {
+                {Mexico.locations.map((location: { id: string; name: string; path: string }, index: number) => {
                   const stateName = idToStateName[location.id] || location.name;
                   const isHovered = hoveredState === stateName;
                   const isSelected = selectedState === stateName;

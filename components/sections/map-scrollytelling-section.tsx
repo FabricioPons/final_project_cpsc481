@@ -282,7 +282,7 @@ export function MapScrollytellingSection() {
                 </defs>
                 <rect x="-50" y="-50" width="1200" height="900" fill="url(#ms-ocean)" />
 
-                {Mexico.locations.map((loc) => {
+                {Mexico.locations.map((loc: { id: string; name: string; path: string }) => {
                   const name = idToStateName[loc.id] ?? loc.name;
                   const isHovered = hoveredState === name;
                   const isSelected = selectedState === name;
@@ -641,7 +641,7 @@ export function MapScrollytellingSection() {
           aria-label="Mexico violence map"
         >
           <rect x="-50" y="-50" width="1200" height="900" fill="#0a0f1a" />
-          {Mexico.locations.map((loc) => {
+          {Mexico.locations.map((loc: { id: string; name: string; path: string }) => {
             const name = idToStateName[loc.id] ?? loc.name;
             const data = getStateData(name);
             return (

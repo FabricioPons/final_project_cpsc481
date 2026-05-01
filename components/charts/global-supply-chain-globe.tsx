@@ -245,11 +245,7 @@ export function GlobalSupplyChainGlobe() {
               <span className="text-muted-foreground">Money Laundering Routes</span>
             </div>
           </div>
-        </div>
-        
-        {/* Instructions */}
-        <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-border z-10">
-          <p className="text-xs text-muted-foreground">Drag to rotate | Scroll to zoom | Hover for info</p>
+          <p className="text-xs text-muted-foreground mt-3 pt-2 border-t border-border/50">Drag to rotate | Scroll to zoom</p>
         </div>
       </div>
 
