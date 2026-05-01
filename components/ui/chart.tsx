@@ -130,6 +130,7 @@ const ChartTooltip = ({
   color?: string
   nameKey?: string
   labelKey?: string
+  labelClassName?: string
 }) => {
   const { config } = useChart()
 
@@ -149,8 +150,8 @@ const ChartTooltip = ({
       {!hideLabel && (
         <div className={cn("font-medium", labelClassName)}>
           {labelFormatter
-            ? labelFormatter(tooltipLabel as string)
-            : tooltipLabel}
+            ? labelFormatter(String(tooltipLabel ?? ""))
+            : String(tooltipLabel ?? "")}
         </div>
       )}
       <div className="grid gap-1.5">
